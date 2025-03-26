@@ -34,6 +34,7 @@ import Layout from './components/Layout';
 import { AuthProvider } from './context/AuthContext';
 import GetUsers from './pages/GetUsers';
 import UpdatePassword from './pages/UpdatePassword';
+import Updateuser from './pages/UpdateUser';
 
 function App() {
   return (
@@ -46,7 +47,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="create-user" element={<CreateUser />} />
-            <Route path="update-user" element={<CreateUser />} />
+            <Route path="update-user" element={<Updateuser />} />
             <Route path="get-user" element={<GetUsers />} />
             <Route path="update-password" element={<UpdatePassword />} />
             <Route path="view-bhisham" element={<ViewBhisham />} />

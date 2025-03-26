@@ -7,9 +7,19 @@ import { useLocation } from 'react-router-dom';
 const UpdatePassword = () => {
   const location = useLocation();
   const { state } = location;
+  console.log('state', state)
   const users = state?.data || [];
-  console.log('users here', users)
-  const [loginId, setLoginId] = useState(users.user_id);
+  console.log('users here are', users)
+  
+  // const { state } = location;
+  // console.log('state', state)
+  // const users = state?.data || [];
+  // const users = location.state?.user
+  // console.log('users here', users)
+  // const {user} = location?.state
+  // const [loginId, setLoginId] = useState(user);
+  const [loginId, setLoginId] = useState("");
+
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");

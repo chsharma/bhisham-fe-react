@@ -1,154 +1,3 @@
-// import axios from 'axios';
-
-// // Create axios instance with base URL
-// const api = axios.create({
-//   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
-
-// // Add a request interceptor to include auth token
-// api.interceptors.request.use((config) => {
-//   const user = JSON.parse(localStorage.getItem('user') || '{}');
-//   if (user.token) {
-//     config.headers.Authorization = `Bearer ${user.token}`;
-//   }
-//   return config;
-// });
-
-// // Dashboard
-// export const getDashboardCounts = async () => {
-//   // For demo purposes, return mock data
-//   // In a real app: return api.get('/dashboard/counts');
-//   return Promise.resolve({
-//     data: {
-//       bhisham: 24,
-//       cc: 36,
-//       kits: 89,
-//       mc: 12
-//     }
-//   });
-// };
-
-// // User management
-// export const createUser = async (userData) => {
-//   // For demo: return api.post('/users', userData);
-//   try {
-//     console.log('Inside api post create User request', userData)
-//     const response = await api.post(`/user/create-user`, userData);
-//     return response.data; 
-//   } catch (error) {
-//     console.error('Error creating user:', error);
-//     throw error; 
-//   }
-//   // return Promise.resolve({ data: { ...userData, id: Date.now() } });
-// };
-
-// // Bhisham management
-// export const getAllBhisham = async () => {
-//   // For demo purposes, return mock data
-//   // In a real app: return api.get('/bhisham');
-//   return Promise.resolve({
-//     data: [
-//       {
-//         id: 1,
-//         name: 'Bhisham Alpha',
-//         created_by: 'Admin User',
-//         status: 'complete',
-//         serial_no: 'BH001',
-//         complete_time: '2023-12-10 14:32:45'
-//       },
-//       {
-//         id: 2,
-//         name: 'Bhisham Beta',
-//         created_by: 'Admin User',
-//         status: 'incomplete',
-//         serial_no: 'BH002',
-//         complete_time: null
-//       },
-//       {
-//         id: 3,
-//         name: 'Bhisham Gamma',
-//         created_by: 'Test User',
-//         status: 'complete',
-//         serial_no: 'BH003',
-//         complete_time: '2024-01-15 09:22:33'
-//       },
-//       {
-//         id: 4,
-//         name: 'Bhisham Delta',
-//         created_by: 'Admin User',
-//         status: 'incomplete',
-//         serial_no: 'BH004',
-//         complete_time: null
-//       }
-//     ]
-//   });
-// };
-
-// export const createBhisham = async (bhishamData) => {
-//   // For demo: return api.post('/bhisham', bhishamData);
-//   return Promise.resolve({ 
-//     data: {
-//       ...bhishamData,
-//       id: Date.now(),
-//       created_by: 'Admin User',
-//       status: 'incomplete',
-//       complete_time: null
-//     }
-//   });
-// };
-
-// export const completeBhisham = async (bhishamId) => {
-//   // For demo: return api.put(/bhisham/${bhishamId}/complete);
-//   return Promise.resolve({ 
-//     data: {
-//       id: bhishamId,
-//       status: 'complete',
-//       complete_time: new Date().toISOString().replace('T', ' ').substr(0, 19)
-//     }
-//   });
-// };
-
-// // MotherBox and Cubes management
-// export const getCubesByMotherBox = async (bhishamId, motherBoxId) => {
-//   // For demo: return api.get(/bhisham/${bhishamId}/motherbox/${motherBoxId}/cubes);
-//   return Promise.resolve({
-//     data: [
-//       { id: 1, name: 'Cube A' },
-//       { id: 2, name: 'Cube B' },
-//       { id: 3, name: 'Cube C' },
-//     ]
-//   });
-// };
-
-// export const getKitsByCube = async (bhishamId, motherBoxId, cubeId) => {
-//   // For demo: return api.get(/bhisham/${bhishamId}/motherbox/${motherBoxId}/cube/${cubeId}/kits);
-//   return Promise.resolve({
-//     data: [
-//       { id: 1, name: 'Kit 1' },
-//       { id: 2, name: 'Kit 2' },
-//       { id: 3, name: 'Kit 3' },
-//     ]
-//   });
-// };
-
-// export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitId) => {
-//   // For demo: return api.get(/bhisham/${bhishamId}/motherbox/${motherBoxId}/cube/${cubeId}/kit/${kitId}/items);
-//   return Promise.resolve({
-//     data: [
-//       { id: 1, name: 'Item X' },
-//       { id: 2, name: 'Item Y' },
-//       { id: 3, name: 'Item Z' },
-//     ]
-//   });
-// };
-
-// export default api;
-
-
-
 import axios from 'axios';
 
 // Create axios instance with base URL
@@ -172,8 +21,6 @@ api.interceptors.request.use((config) => {
 
 // Dashboard
 export const getDashboardCounts = async () => {
-  // For demo purposes, return mock data
-  // In a real app: return api.get('/dashboard/counts');
   console.log('inside this')
   try{
     console.log('Inside api post create User request')
@@ -184,20 +31,11 @@ export const getDashboardCounts = async () => {
     console.error('Error creating user:', err);
     throw err;
   }
-  // return Promise.resolve({
-  //   data: {
-  //     bhisham: 24,
-  //     cc: 36,
-  //     kits: 89,
-  //     mc: 12
-  //   }
-  // });
 };
 
-// User management
+
 export const createUser = async (userData) => {
-  // For demo: return api.post('/users', userData);
-  // return Promise.resolve({ data: { ...userData, id: Date.now() } });
+
     try {
     console.log('Inside api post create User request', userData)
     const response = await api.post(`/user/create-user`, JSON.stringify(userData));
@@ -208,10 +46,7 @@ export const createUser = async (userData) => {
   }
 };
 
-// Bhisham management
 export const getAllBhisham = async () => {
-  // For demo purposes, return mock data
-  // In a real app: return api.get('/bhisham');
   try{
     console.log('inside bhishams')
     const response = await api.get('/dashboard/get-bhisham');
@@ -220,42 +55,6 @@ export const getAllBhisham = async () => {
   } catch(error) {
     console.log('error', error)
   }
-  // return Promise.resolve({
-  //   data: [
-  //     {
-  //       id: 1,
-  //       name: 'Bhisham Alpha',
-  //       created_by: 'Admin User',
-  //       status: 'complete',
-  //       serial_no: 'BH001',
-  //       complete_time: '2023-12-10 14:32:45'
-  //     },
-  //     {
-  //       id: 2,
-  //       name: 'Bhisham Beta',
-  //       created_by: 'Admin User',
-  //       status: 'incomplete',
-  //       serial_no: 'BH002',
-  //       complete_time: null
-  //     },
-  //     {
-  //       id: 3,
-  //       name: 'Bhisham Gamma',
-  //       created_by: 'Test User',
-  //       status: 'complete',
-  //       serial_no: 'BH003',
-  //       complete_time: '2024-01-15 09:22:33'
-  //     },
-  //     {
-  //       id: 4,
-  //       name: 'Bhisham Delta',
-  //       created_by: 'Admin User',
-  //       status: 'incomplete',
-  //       serial_no: 'BH004',
-  //       complete_time: null
-  //     }
-  //   ]
-  // });
 };
 
 export const createBhisham = async (bhishamData) => {
