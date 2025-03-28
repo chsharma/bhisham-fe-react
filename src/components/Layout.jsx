@@ -11,6 +11,7 @@ const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [bhishamDropdownOpen, setBhishamDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -24,6 +25,9 @@ const Layout = () => {
   const toggleBhishamDropdown = () => {
     setBhishamDropdownOpen(!bhishamDropdownOpen);
   };
+
+  const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
+
 
   const toggleUserDropdown = () => {
     setUserDropdownOpen(!userDropdownOpen);
@@ -54,20 +58,20 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-300 text-gray-900">
-
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] shadow-2xl transition-transform duration-300 lg:translate-x-0 lg:static ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Sidebar Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
+
           <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHAM App</h2>
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
           >
+
             <FiX className="w-6 h-6 text-white" />
           </button>
         </div>
@@ -119,7 +123,7 @@ const Layout = () => {
                 >
                   Create Users
                 </NavLink>
-                <NavLink
+                {/* <NavLink
                   to="/update-user"
                   className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
                   onClick={navigateToUpdateUser}
@@ -132,7 +136,7 @@ const Layout = () => {
                   onClick={navigateToUpdatePassword}
                 >
                   Update Password
-                </NavLink>
+                </NavLink> */}
               </div>
             )}
           </div>
@@ -195,22 +199,42 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        
         {/* Header */}
-        <header className="bg-white h-24 flex items-center justify-between px-12 border-b shadow-lg">
-          <button
-            onClick={toggleSidebar}
-            className="p-3 rounded-md lg:hidden hover:bg-gray-200 transition"
-          >
+        <header className="bg-white flex items-center justify-between px-12 border-b shadow-lg" style={{ height: '5rem' }}>
+          <button onClick={toggleSidebar} className="p-3 rounded-md lg:hidden hover:bg-gray-200 transition">
             <FiMenu className="w-7 h-7 text-gray-600" />
           </button>
+
           <h1 className="text-4xl font-bold text-gray-800">
             {location.pathname === '/' && 'Dashboard'}
             {location.pathname === '/create-user' && 'Create User'}
             {location.pathname === '/view-bhisham' && 'View Bhisham'}
             {location.pathname === '/create-bhisham' && 'Create Bhisham'}
           </h1>
-          <div></div>
+
+          {/* User Profile Section */}
+          <div className="relative">
+            <button onClick={toggleProfileDropdown} className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-lg font-bold rounded-full">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-lg font-medium text-gray-700">{user.name}</span>
+              <FiChevronDown className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {profileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-xl">
+                <div className="p-4 border-b">
+                  <p className="text-lg font-bold">{user.name}</p>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+                <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-4 text-red-400 hover:bg-gray-100">
+                  <FiLogOut className="w-6 h-6" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Page Content */}
@@ -218,17 +242,8 @@ const Layout = () => {
           <Outlet />
         </main>
       </div>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          onClick={toggleSidebar}
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-        />
-      )}
     </div>
   );
 };
 
 export default Layout;
-

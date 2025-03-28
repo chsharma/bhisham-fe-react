@@ -13,7 +13,7 @@ api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   console.log('inside user', user)
   if (user.token) {
-    config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTA1MDEzOTksInVzZXJfaWQiOiJjaHNoYXJtYSJ9.p_q1vjpbSrnAY5YrPKa1G1FcTLYpJatEEF1J669ThUc`;
+    config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTA0MjI2MjUsInVzZXJfaWQiOiJjaHNoYXJtYSJ9.6WxzQykxIN5H5v8HaclcWpaXh8DHFD1XUMaatQLf8Io`;
   }
   return config;
 });
@@ -45,6 +45,17 @@ export const createUser = async (userData) => {
     throw error; 
   }
 };
+
+export const updateUser = async (userData) => {
+  try {
+  const response = await api.post(`user/update-user`, JSON.stringify(userData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
+
 
 export const getAllBhisham = async () => {
   try{
@@ -122,8 +133,8 @@ export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitName, com
   // For demo: return api.get(dashboard/get-mapping-items?bhishamid=1&mcno=1&ccno=1&kitname=PAIN RELIEF KIT);
   try {
 
-    const response = complete === 1 ? await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitname=${kitName}`) : 
-    await api.get(`dashboard/get-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitname=${kitName}`)
+    const response = complete === 1 ? await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) : 
+    await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`)
     console.log('item response', response?.data)
     return response?.data
   } catch(err) {
@@ -245,5 +256,17 @@ export const updatePasswordPageApi = async(loginId, newPassword) => {
     console.log('error', err)
   }
 }
+
+export const getUpdateDataType = async() => {
+  try {
+ 
+    const response = await api.get(`dashboard/data-update-type`);
+    console.log(response)
+    return response?.data?.data
+  } catch(err) {
+    console.log('error', err)
+  }
+}
+
 
 export default api;

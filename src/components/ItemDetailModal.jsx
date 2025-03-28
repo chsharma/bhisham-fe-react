@@ -1,38 +1,50 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { toast } from 'react-toastify';
-import { FiX, FiEdit, FiInfo } from 'react-icons/fi';
+import { FiX, FiEdit } from 'react-icons/fi';
+import {
+  getUpdateDataType
+} from '../services/api';
 
 const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
-  const [showUpdateOptions, setShowUpdateOptions] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  console.log(item)
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    sku_name: item?.sku_name || '',
+    kit_name: item?.kit_name || '',
+    exp: item?.exp || '',
+    update_typeid: '',
+  });
 
-  const updateOptions = [
-    { id: 1, name: 'Replace Component' },
-    { id: 2, name: 'Upgrade Firmware' },
-    { id: 3, name: 'Recalibrate' }
-  ];
+  const [updateOptions, setupdateOptions] = useState([]);
 
-  const handleUpdateClick = () => {
-    setShowUpdateOptions(true);
+
+  useEffect(() => {
+    const fetchBhishamDetails = async () => {
+      try {
+        const response = await getUpdateDataType();
+        console.log('inside the response array', response)
+        setupdateOptions(response);
+      } catch (error) {
+        console.error('Error fetching Options details:', error);
+      }
+    };
+    fetchBhishamDetails();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectOption = async (option) => {
-    setSelectedOption(option);
-    setIsUpdating(true);
-    
+  const handleSubmit = async () => {
     try {
-      // This would be your API call to update the item
-      await onUpdate(item.id, option.id);
-      toast.success(`Item updated successfully with action: ${option.name}`);
-      setShowUpdateOptions(false);
-      setIsUpdating(false);
+      await onUpdate(item.id, formData);
+      toast.success('Item updated successfully!');
       onClose();
     } catch (error) {
       toast.error('Failed to update item');
-      console.error('Error updating item:', error);
-      setIsUpdating(false);
+      console.error(error);
     }
   };
 
@@ -64,100 +76,49 @@ const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex justify-between items-center mb-4">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Item Details
-                  </Dialog.Title>
-                  <button
-                    type="button"
-                    className="text-gray-400 hover:text-gray-500"
-                    onClick={onClose}
-                  >
+                  <Dialog.Title className="text-lg font-medium leading-6 text-gray-900">Item Details</Dialog.Title>
+                  <button className="text-gray-400 hover:text-gray-500" onClick={onClose}>
                     <FiX className="h-5 w-5" />
                   </button>
                 </div>
 
-                {/* Item Details */}
-                <div className="bg-gray-50 p-4 rounded-md mb-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Item Name</p>
-                      <p className="font-medium">{item?.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Kit Name</p>
-                      <p className="font-medium">{item?.kitName || 'Unknown'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Expiration</p>
-                      <p className="font-medium">{item?.expiration || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Status</p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        item?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {item?.status || 'Unknown'}
-                      </span>
-                    </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-gray-500">Item Name</label>
+                    <input type="text" name="sku_name" value={formData.sku_name} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
                   </div>
-                  
-                  {item?.description && (
-                    <div className="mt-3">
-                      <p className="text-sm text-gray-500">Description</p>
-                      <p className="text-sm mt-1">{item.description}</p>
-                    </div>
-                  )}
+                  <div>
+                    <label className="text-sm text-gray-500">Kit Name</label>
+                    <input type="text" name="kit_name" value={formData.kit_name} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">Expiration Date</label>
+                    <input type="date" name="exp" value={formData.exp} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">Update Action</label>
+                    <select name="updateAction" value={formData.update_typeid} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2">
+                      <option value="">Select an action</option>
+                      {updateOptions.map((option) => (
+                        <option key={option.update_typeid} value={option.update_typeid}>{option.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                {/* Update Options */}
-                {showUpdateOptions ? (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Select Update Action</h4>
-                    <div className="space-y-2">
-                      {updateOptions.map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() => handleSelectOption(option)}
-                          disabled={isUpdating}
-                          className="w-full p-2 text-left rounded-md flex items-center hover:bg-gray-100"
-                        >
-                          <FiInfo className="mr-2 text-primary" />
-                          {option.name}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    {isUpdating && (
-                      <div className="flex justify-center items-center mt-4">
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary"></div>
-                        <span className="ml-2 text-sm text-gray-600">Updating...</span>
-                      </div>
-                    )}
-                    
-                    <button
-                      type="button"
-                      className="mt-4 btn btn-secondary w-full"
-                      onClick={() => setShowUpdateOptions(false)}
-                      disabled={isUpdating}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      type="button"
-                      className="btn btn-primary flex items-center"
-                      onClick={handleUpdateClick}
-                    >
+                <div className="flex justify-end space-x-4 mt-4">
+                  {isEditing ? (
+                    <>
+                      <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
+                      <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
+                    </>
+                  ) : (
+                    <button className="btn btn-primary flex items-center" onClick={() => setIsEditing(true)}>
                       <FiEdit className="mr-2" />
-                      Update Item
+                      Edit Item
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
