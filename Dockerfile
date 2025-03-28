@@ -1,33 +1,30 @@
-# Stage 1: Build the React application
-FROM node:18-slim AS builder
+# Stage 1: Build the React app
+FROM node:18-alpine AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
-COPY package*.json ./
-
-# Install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the React application for production
 RUN npm run build
 
+# Stage 2: Serve the React app using Nginx
+FROM nginx:alpine
 
-# Stage 2: Serve the built application
-FROM node:18-slim AS alpine
+WORKDIR /usr/share/nginx/html
 
-# Install serve - a lightweight static file server
-RUN npm install -g serve
+# Remove default Nginx static files
+RUN rm -rf ./*
 
-# Copy the built files from the previous stage
-COPY --from=build /app/build /app/build
+# Copy built files from the builder stage
+COPY --from=builder /app/dist .
 
-# Expose port 3000 for the server
+# Expose port 3000
 EXPOSE 3000
 
-# Serve the build folder on port 3000
-CMD ["serve", "-s", "/app/build", "-l", "3000"]
+# Replace default Nginx config to serve on port 3000
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+CMD ["nginx", "-g", "daemon off;"]
