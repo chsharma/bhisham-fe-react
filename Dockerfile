@@ -1,30 +1,34 @@
-# Stage 1: Build the React app
+# Stage 1: Build the Vite app
 FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json first (for better caching)
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the project files
+COPY . .
+
+# Build the project
+RUN npm run build
+
+# Stage 2: Serve the app using a simple Node.js server
+FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm install
+# Install a lightweight static file server
+RUN npm install -g serve
 
-COPY . .
-
-RUN npm run build
-
-# Stage 2: Serve the React app using Nginx
-FROM nginx:alpine
-
-WORKDIR /usr/share/nginx/html
-
-# Remove default Nginx static files
-RUN rm -rf ./*
-
-# Copy built files from the builder stage
-COPY --from=builder /app/dist .
+# Copy built files from builder stage
+COPY --from=builder /app/dist /app
 
 # Expose port 3000
 EXPOSE 3000
 
-# Replace default Nginx config to serve on port 3000
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start the app
+CMD ["serve", "-s", ".", "-l", "3000"]
