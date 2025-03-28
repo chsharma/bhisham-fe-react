@@ -197,7 +197,7 @@ const Layout = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         
         {/* Header */}
-        <header className="bg-white h-24 flex items-center justify-between px-12 border-b shadow-lg">
+        <header className="bg-white flex items-center justify-between px-12 border-b shadow-lg" style = {{height: "5rem"}}>
           <button
             onClick={toggleSidebar}
             className="p-3 rounded-md lg:hidden hover:bg-gray-200 transition"

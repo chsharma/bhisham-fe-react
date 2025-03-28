@@ -122,8 +122,8 @@ export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitName, com
   // For demo: return api.get(dashboard/get-mapping-items?bhishamid=1&mcno=1&ccno=1&kitname=PAIN RELIEF KIT);
   try {
 
-    const response = complete === 1 ? await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitname=${kitName}`) : 
-    await api.get(`dashboard/get-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitname=${kitName}`)
+    const response = complete === 1 ? await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) : 
+    await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`)
     console.log('item response', response?.data)
     return response?.data
   } catch(err) {

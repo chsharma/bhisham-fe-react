@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { FiX, FiEdit, FiInfo } from 'react-icons/fi';
 
 const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
+  console.log("itemekskds", item)
   const [showUpdateOptions, setShowUpdateOptions] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -84,15 +85,15 @@ const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-500">Item Name</p>
-                      <p className="font-medium">{item?.name}</p>
+                      <p className="font-medium">{item?.sku_name}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Kit Name</p>
-                      <p className="font-medium">{item?.kitName || 'Unknown'}</p>
+                      <p className="font-medium">{item?.kit_name || 'Unknown'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Expiration</p>
-                      <p className="font-medium">{item?.expiration || 'N/A'}</p>
+                      <p className="font-medium">{item?.exp || 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
