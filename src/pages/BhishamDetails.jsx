@@ -229,7 +229,7 @@ const BhishamDetails = () => {
     }
   };
 
-  console.log("itemsitemsitems", items)
+  console.log("itemsitemsitems", selectedItem)
 
   return (
     <div>
