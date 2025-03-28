@@ -49,7 +49,7 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary">Bhisham App</h1>
+            <h1 className="text-3xl font-bold text-primary">BHISHM App</h1>
             <p className="text-gray-500 mt-2">Login to your account</p>
           </div>
           

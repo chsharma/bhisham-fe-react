@@ -59,7 +59,7 @@ const Dashboard = () => {
         {/* Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard 
-            title="Bhisham" 
+            title="BHISHM" 
             count={counts.bhisham} 
             icon={FiPackage} 
             color="bg-blue-500" 
@@ -90,11 +90,11 @@ const Dashboard = () => {
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">Quick Actions</h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              <Link to="/create-bhisham" className="bg-primary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-primary-dark transition">
-                Create New Bhisham
+              <Link to="/create-bhishm" className="bg-primary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-primary-dark transition">
+                Create New Bhishm
               </Link>
-              <Link to="/view-bhisham" className="bg-secondary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-secondary-dark transition">
-                View All Bhisham
+              <Link to="/view-bhishm" className="bg-secondary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-secondary-dark transition">
+                View All Bhishm
               </Link>
               <Link to="/create-user" className="bg-accent text-dark py-3 px-6 rounded-lg text-center shadow-md hover:bg-accent-dark transition">
                 Create New User
