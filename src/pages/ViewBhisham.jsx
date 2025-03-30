@@ -60,7 +60,7 @@ const ViewBhisham = () => {
         )
       );
       
-      toast.success('Bhisham marked as complete');
+      toast.success('Bhishm marked as complete');
     } catch (error) {
       toast.error('Failed to complete Bhisham');
       console.error('Error completing Bhisham:', error);
@@ -87,14 +87,14 @@ const ViewBhisham = () => {
           <input
             type="text"
             className="input pl-10"
-            placeholder="Search Bhisham..."
+            placeholder="Search Bhishm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <Link to="/create-bhisham" className="btn btn-primary flex-grow md:flex-grow-0">
+          <Link to="/create-bhishm" className="btn btn-primary flex-grow md:flex-grow-0">
             Create New Bhisham
           </Link>
           <button

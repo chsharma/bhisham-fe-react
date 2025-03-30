@@ -65,8 +65,13 @@ const Layout = () => {
         }`}
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">Bhisham App</h2>
-          <button onClick={toggleSidebar} className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition">
+
+          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHAM App</h2>
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
+          >
+
             <FiX className="w-6 h-6 text-white" />
           </button>
         </div>
