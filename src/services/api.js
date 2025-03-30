@@ -133,7 +133,7 @@ export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitName, com
   // For demo: return api.get(dashboard/get-mapping-items?bhishamid=1&mcno=1&ccno=1&kitname=PAIN RELIEF KIT);
   try {
 
-    const response = complete === 1 ? await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) : 
+    const response = complete === 1 ? await api.get(`dashboard/get-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) : 
     await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`)
     console.log('item response', response?.data)
     return response?.data
@@ -267,6 +267,21 @@ export const getUpdateDataType = async() => {
     console.log('error', err)
   }
 }
+
+
+export const createItem = async (itemData, complete) => {
+
+  try {
+  console.log('Inside api post create Item request', itemData)
+
+  let url = complete ? '/bhisham/add-mapping-data' : 'bhisham/add-bhisham-data'
+  const response = await api.post(url, JSON.stringify(itemData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
 
 
 export default api;

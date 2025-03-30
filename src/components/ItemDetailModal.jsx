@@ -6,17 +6,28 @@ import {
   getUpdateDataType
 } from '../services/api';
 
-const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
+const ItemDetailModal = ({ isOpen, onClose, item, onUpdate, bhisham }) => {
   console.log(item)
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    sku_name: item?.sku_name || '',
-    kit_name: item?.kit_name || '',
+    batch_no_sr_no: item?.batch_no_sr_no || '',
+    mfd: item?.mfd || '',
     exp: item?.exp || '',
     update_typeid: '',
   });
 
   const [updateOptions, setupdateOptions] = useState([]);
+
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        batch_no_sr_no: item?.batch_no_sr_no || '',
+        mfd: item?.mfd || '',
+        exp: item?.exp || '',
+        update_typeid: '',
+      });
+    }
+  }, [item]);
 
 
   useEffect(() => {
@@ -34,12 +45,17 @@ const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(name, value)
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  console.log(formData)
+
   const handleSubmit = async () => {
     try {
-      await onUpdate(item.id, formData);
+
+      console.log(formData)
+      // await onUpdate(item.id, formData);
       toast.success('Item updated successfully!');
       onClose();
     } catch (error) {
@@ -82,14 +98,14 @@ const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
                   </button>
                 </div>
 
-                <div className="space-y-4">
+                {item ? <div className="space-y-4">
                   <div>
-                    <label className="text-sm text-gray-500">Item Name</label>
-                    <input type="text" name="sku_name" value={formData.sku_name} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
+                    <label className="text-sm text-gray-500">Batch Serial No</label>
+                    <input type="text" name="batch_no_sr_no" value={formData.batch_no_sr_no} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">Kit Name</label>
-                    <input type="text" name="kit_name" value={formData.kit_name} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
+                    <label className="text-sm text-gray-500">Mfg Date</label>
+                    <input type="date" name="mfd" value={formData.mfd} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Expiration Date</label>
@@ -97,14 +113,21 @@ const ItemDetailModal = ({ isOpen, onClose, item, onUpdate }) => {
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Update Action</label>
-                    <select name="updateAction" value={formData.update_typeid} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2">
+                    <select
+                      name="update_typeid"
+                      value={formData.update_typeid}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className="w-full border rounded p-2"
+                    >
                       <option value="">Select an action</option>
                       {updateOptions.map((option) => (
                         <option key={option.update_typeid} value={option.update_typeid}>{option.name}</option>
                       ))}
                     </select>
                   </div>
-                </div>
+                </div> :
+                  <p>Loading item details...</p>}
 
                 <div className="flex justify-end space-x-4 mt-4">
                   {isEditing ? (

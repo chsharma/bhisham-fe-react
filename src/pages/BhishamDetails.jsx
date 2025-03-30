@@ -9,8 +9,9 @@ import {
   getItemDetails,
   updateItem
 } from '../services/api';
-import { FiArrowLeft, FiBox, FiPackage, FiGrid, FiInfo, FiCheckCircle, FiAlertCircle, FiCircle, FiXCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiBox, FiPackage, FiGrid, FiInfo, FiCheckCircle, FiAlertCircle, FiCircle, FiXCircle, FiPlusCircle } from 'react-icons/fi';
 import ItemDetailModal from '../components/ItemDetailModal';
+import AddItemDialog from '../components/AddItemModal';
 const BhishamDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const BhishamDetails = () => {
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [iAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [loadingItemDetails, setLoadingItemDetails] = useState(false);
 
@@ -44,10 +47,12 @@ const BhishamDetails = () => {
 
   useEffect(() => {
     const filtered = cubes.filter((cube) =>
-      cube.cc_name.toLowerCase().includes(searchTerm.toLowerCase())
+      cube.cc_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cube.cc_no.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredCubes(filtered);
   }, [searchTerm, cubes]);
+
 
   useEffect(() => {
     const filtered = items.filter((item) =>
@@ -170,6 +175,12 @@ const BhishamDetails = () => {
     }
   };
 
+  const handleAddItem = async () => {
+    setIsAddModalOpen(true);
+  };
+
+
+
   // Function to handle item update
   const handleItemUpdate = async (itemId, actionId) => {
     try {
@@ -211,23 +222,65 @@ const BhishamDetails = () => {
   }
 
   const getCubeStatus = (cube) => {
+    const commonStyles = "w-4 h-4 min-w-[1rem] min-h-[1rem] rounded-full";
+
     if (cube.total_update_item === cube.total_item) {
       return {
-        icon: <div className="w-4 h-4 bg-green-500 rounded-full" />,
+        icon: <div className={`${commonStyles} bg-green-500`} />,
         bgColor: 'bg-green-100',
       };
     } else if (cube.total_update_item === 0) {
       return {
-        icon: <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'rgb(249 117 117)' }} />,
+        icon: <div className={`${commonStyles}`} style={{ backgroundColor: 'rgb(249 117 117)' }} />,
         bgColor: 'bg-red-100',
       };
     } else {
       return {
-        icon: <div className="w-4 h-4 bg-yellow-500 rounded-full" />,
+        icon: <div className={`${commonStyles} bg-yellow-500`} />,
         bgColor: 'bg-yellow-100',
       };
     }
   };
+
+  const getKitStatus = (kit) => {
+    const commonStyles = "w-4 h-4 min-w-[1rem] min-h-[1rem] rounded-full";
+
+    if (kit.total_update_item === kit.total_item) {
+      return {
+        icon: <div className={`${commonStyles} bg-green-500`} />,
+        bgColor: 'bg-green-100',
+      };
+    } else if (kit.total_update_item === 0) {
+      return {
+        icon: <div className={`${commonStyles}`} style={{ backgroundColor: 'rgb(249 117 117)' }} />,
+        bgColor: 'bg-red-100',
+      };
+    } else {
+      return {
+        icon: <div className={`${commonStyles} bg-yellow-500`} />,
+        bgColor: 'bg-yellow-100',
+      };
+    }
+  };
+
+  const getItemStatus = (item) => {
+    const commonStyles = "w-4 h-4 min-w-[1rem] min-h-[1rem] rounded-full";
+
+    if (item.is_update) {
+      return {
+        icon: <div className={`${commonStyles} bg-green-500`} />,
+        bgColor: 'bg-green-100',
+      };
+    } else {
+      return {
+        icon: <div className={`${commonStyles}`} style={{ backgroundColor: 'rgb(249 117 117)' }} />,
+        bgColor: 'bg-red-100',
+      };
+    }
+  };
+
+
+
 
   console.log("itemsitemsitems", selectedItem)
 
@@ -352,7 +405,7 @@ const BhishamDetails = () => {
                         }`}
                     >
                       <div className="flex items-center">
-                        {cube.cc_name}
+                        {cube.cc_no ? `${cube.cc_no} - ${cube.cc_name}` : cube.cc_name}
                       </div>
                       {icon}
 
@@ -386,19 +439,36 @@ const BhishamDetails = () => {
                   flexDirection: 'column',
                   gap: '0.7rem'
                 }}>
-                  {kits.map((kit, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleKitSelect(index, kit.kit_slug)}
-                      className={`w-full p-3 text-left rounded-md flex items-center ${selectedKit === index
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                        }`}
-                    >
-                      {/* <FiGrid className="mr-2" /> */}
-                      {kit.kitname}
-                    </button>
-                  ))}
+                  {kits.map((kit, index) => {
+                    const { icon, bgColor } = getKitStatus(kit);
+
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleKitSelect(index, kit.kit_slug)}
+
+                        className={`w-full p-3 text-left rounded-md flex items-center justify-between ${selectedKit === index
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-50 hover:bg-gray-100'
+                          }`}
+                      >
+
+
+
+                        <div className="flex  flex-col">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {kit.kitname}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            <b>Item Size: </b>{kit.total_item} • <b>Exp:</b> {kit.kit_expiry || 'N/A'}
+                          </p>
+                        </div>
+                        {icon}
+
+
+                      </button>
+                    )
+                  })}
                 </div>
               ) : (
                 <p className="text-gray-500 text-center py-4">
@@ -416,14 +486,18 @@ const BhishamDetails = () => {
           <div className="bg-white rounded-lg shadow-md" style={{ height: '30rem', overflow: 'hidden' }}>
             <div className="p-6 border-b sticky top-0 bg-white z-10 flex justify-between items-center" style={{ padding: '1rem' }}>
               <h3 className="text-lg font-medium text-gray-700">Items</h3>
-              <input
-                type="text"
-                placeholder="Search Items..."
-                value={searchTermItems}
-                onChange={(e) => setSearchTermItems(e.target.value)}
-                className="w-full p-2 border rounded-md"
-                style={{ width: '13rem' }}
-              />
+              <div className=" flex justify-between items-center gap-5" >  <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />
+
+
+                <input
+                  type="text"
+                  placeholder="Search Items..."
+                  value={searchTermItems}
+                  onChange={(e) => setSearchTermItems(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  style={{ width: '13rem' }}
+                /> </div>
+
             </div>
             {/* <h3 className="text-lg font-medium text-gray-700 mb-4">Items</h3> */}
             {selectedKit !== null && selectedKit !== undefined ? (loadingItems ? (
@@ -437,31 +511,37 @@ const BhishamDetails = () => {
                 flexDirection: 'column',
                 gap: '0.7rem'
               }} >
-                {filteredItems.map((item) => (
-                  <li
-                    key={item.id}
-                    className=" hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
-                    onClick={() => handleItemClick(item)}
-                    style={{ padding: '1rem' }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {item.sku_name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {item.kit_name} • Exp: {item.exp || 'N/A'}
-                        </p>
-                      </div>
-                      {/* <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                {filteredItems.map((item) => {
+                  const { icon, bgColor } = getItemStatus(item);
+                  return (
+
+                    <li
+                      key={item.id}
+                      className=" hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+                      onClick={() => handleItemClick(item)}
+                      style={{ padding: '1rem' }}
+                    >
+
+                      <div className="flex items-center justify-between">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {item.sku_name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
+                          </p>
+                        </div>
+                        {/* <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                         }`}>
                           {item.status || 'Unknown'}
                         </span> */}
-                      <FiInfo className="ml-2 text-primary" />
-                    </div>
-                  </li>
-                ))}
+                        {/* <FiInfo className="ml-2 text-primary" /> */}
+                        {icon}
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             ) : (
               <p className="text-gray-500 text-center py-4">
@@ -475,7 +555,8 @@ const BhishamDetails = () => {
             )}
           </div>
         </div>
-      )}
+      )
+      }
 
       {/* Item Detail Modal */}
       <ItemDetailModal
@@ -483,8 +564,20 @@ const BhishamDetails = () => {
         onClose={() => setIsModalOpen(false)}
         item={selectedItem}
         onUpdate={handleItemUpdate}
+        bhisham={bhisham}
       />
-    </div>
+
+      <AddItemDialog
+        isOpen={iAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        // onUpdate={handleItemUpdate}
+        selectedKitName={selectedKitName}
+        selectedCube={selectedCube}
+        kits={kits}
+        cube={cubes}
+        completed={bhisham.is_complete}
+      />
+    </div >
   );
 };
 
