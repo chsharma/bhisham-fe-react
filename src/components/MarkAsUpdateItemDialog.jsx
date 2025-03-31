@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { FiX, FiEdit } from 'react-icons/fi';
 import {
   getUpdateDataType,
+  markAsUpdateItems,
   updateItems
 } from '../services/api';
 
@@ -64,12 +65,12 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
       data.kit_slug =item.kit_slug;
       data.sku_code = item.sku_code;
       data.sku_slug = item.sku_slug;
-      data.batch_code = formData.batch_no_sr_no;
-      data.mfd = formData.mfd;
-      data.exp = formData.exp;
+      data.batch_code = item.batch_no_sr_no;
+      data.mfd = item.mfd;
+      data.exp = item.exp;
       data.id = item.id;
       data.update_typeid = formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0;
-      await updateItems( data, completed);
+      await markAsUpdateItems( data, completed);
       toast.success('Item updated successfully!');
       setFormData({});
       onClose();
@@ -115,24 +116,11 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
 
                 {item ? <div className="space-y-4">
                   <div>
-                    <label className="text-sm text-gray-500">Batch Serial No</label>
-                    <input type="text" name="batch_no_sr_no" value={formData.batch_no_sr_no} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-500">Mfg Date</label>
-                    <input type="date" name="mfd" value={formData.mfd} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-500">Expiration Date</label>
-                    <input type="date" name="exp" value={formData.exp} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
-                  </div>
-                  <div>
                     <label className="text-sm text-gray-500">Update Action</label>
                     <select
                       name="update_typeid"
                       value={formData.update_typeid}
                       onChange={handleChange}
-                      disabled={!isEditing}
                       className="w-full border rounded p-2"
                     >
                       <option value="">Select an action</option>
@@ -145,17 +133,10 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
                   <p>Loading item details...</p>}
 
                 <div className="flex justify-end space-x-4 mt-4">
-                  {isEditing ? (
-                    <>
+                <>
                       <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
                       <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
                     </>
-                  ) : (
-                    <button className="btn btn-primary flex items-center" onClick={() => setIsEditing(true)}>
-                      <FiEdit className="mr-2" />
-                      Edit Item
-                    </button>
-                  )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

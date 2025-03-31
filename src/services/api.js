@@ -300,7 +300,49 @@ export const createItem = async (itemData, complete) => {
   try {
   console.log('Inside api post create Item request', itemData)
 
-  let url = complete ? '/bhisham/add-mapping-data' : 'bhisham/add-bhisham-data'
+  let url = complete ?   'bhisham/add-bhisham-data' : '/bhisham/add-mapping-data'
+  const response = await api.post(url, JSON.stringify(itemData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
+
+export const updateItems = async (itemData, complete) => {
+
+  try {
+  console.log('Inside api post update Item request', itemData)
+
+  let url = complete ?   'bhisham/update-data' : '/bhisham/update-mapping-data'
+  const response = await api.post(url, JSON.stringify(itemData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
+
+export const deleteItems = async (itemData, complete) => {
+
+  try {
+  console.log('Inside api post delete Item request', itemData)
+
+  let url = complete ?   'bhisham/delete-bhisham-data' : '/bhisham/delete-mapping-data'
+  const response = await api.post(url, JSON.stringify(itemData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
+
+export const markAsUpdateItems = async (itemData, complete) => {
+
+  try {
+  console.log('Inside api post update Item request', itemData)
+
+  let url = complete ?   'bhisham/mark-update-data' : '/bhisham/mark-update-mapping-data'
   const response = await api.post(url, JSON.stringify(itemData));
   return response.data; 
 } catch (error) {
