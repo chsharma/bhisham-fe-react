@@ -29,29 +29,29 @@ export const AuthProvider = ({ children }) => {
       console.log('In the user login')
       const userData = JSON.stringify({login_id: username, password: password})
       console.log('user data', userData)
-      // const response = await axios.post(`https://api.gryfontech.com/v1/api/user/login`,userData , {
-      //   headers:{
-      //     'Content-Type': 'application/json',
-      //     'Accept': 'application/json'
-      //   }
-      // });
-      // console.log('response', response)
-      // const user = response?.data?.data;
-      // const setStorage = response?.data
+      const response = await axios.post(`https://api.gryfontech.com/v1/api/user/login`,userData , {
+        headers:{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      console.log('response', response)
+      const user = response?.data?.data;
+      const setStorage = response?.data
       // console.log('user', user)
       // For demo purposes, we'll simulate a successful login
-      const user = { 
-        id: 1, 
-        name: 'Admin User', 
-        username, 
-        role: 'admin',
-        token: 'sample-jwt-token'
-      }; 
+      // const user = { 
+      //   id: 1, 
+      //   name: 'Admin User', 
+      //   username, 
+      //   role: 'admin',
+      //   token: 'sample-jwt-token'
+      // }; 
             // const setStorage = response?.data
 
       
       // Store user in localStorage
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(setStorage));
       setUser(user);
       return { success: true };
     } catch (error) {
