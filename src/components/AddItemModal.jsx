@@ -49,11 +49,14 @@ const ItemDetailModal = ({ isOpen, onClose, selectedKitName, selectedCube, kits,
             formData.mc_no = selCube.mc_no;
             formData.id = selCube.mc_no;
             formData.kit_code = selKit.kitcode;
-            formData.cube_number = selCube.cc_no;
+            formData.cube_number = selCube.cube_number;
             formData.kit_name = selKit.kitname;
             formData.kit_slug = selKit.kit_slug;
             formData.kit_no = selKit.no_of_kit;
             formData.sku_slug = formData.sku_name;
+            formData.is_update = formData.is_update ? parseInt(formData.is_update, 10) : 0;
+            formData.sku_qty = formData.sku_qty ? parseInt(formData.sku_qty, 10) : 0;
+
 
 
             console.log(formData)

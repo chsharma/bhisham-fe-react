@@ -1,0 +1,20 @@
+no_of_kit in kit desc total kits 
+in delete give dropdown also 
+in item give mark as complete action
+
+
+if bhisam is is_bhisham_close then add delete update no action will be performed 
+
+
+pagination in bhisham 
+
+consildated and raw data 
+
+
+bhisham view info 
+ "hh_serial": null,
+            "hh_synch_time": null,
+            "hh_synch_count": 0,
+            "is_bhisham_close": null,
+            "close_by": null,
+            "close_time": null
