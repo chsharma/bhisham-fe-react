@@ -57,12 +57,6 @@ const ItemDetailModal = ({ isOpen, onClose, selectedKitName, selectedCube, kits,
             formData.is_update = formData.is_update ? parseInt(formData.is_update, 10) : 0;
             formData.sku_qty = formData.sku_qty ? parseInt(formData.sku_qty, 10) : 0;
 
-
-
-            console.log(formData)
-
-
-
               await createItem(formData, completed);
             toast.success('Item created successfully!');
             setFormData({});

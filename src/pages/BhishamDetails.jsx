@@ -12,6 +12,10 @@ import {
 import { FiArrowLeft, FiBox, FiPackage, FiGrid, FiInfo, FiCheckCircle, FiAlertCircle, FiCircle, FiXCircle, FiPlusCircle } from 'react-icons/fi';
 import ItemDetailModal from '../components/ItemDetailModal';
 import AddItemDialog from '../components/AddItemModal';
+import MarkAsUpdateItemDialog from '../components/MarkAsUpdateItemDialog';
+import DeleteItemDialog from '../components/DeleteItemDialog';
+
+import { FiMoreHorizontal } from 'react-icons/fi';
 const BhishamDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,6 +39,8 @@ const BhishamDetails = () => {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [iAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [markAsUpdateModalOpen, setMarkAsUpdateModalOpen] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [loadingItemDetails, setLoadingItemDetails] = useState(false);
@@ -43,6 +49,11 @@ const BhishamDetails = () => {
   const [searchTermItems, setSearchTermItems] = useState('');
   const [filteredCubes, setFilteredCubes] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+
+  const toggleDropdown = (id) => {
+    setDropdownOpen(dropdownOpen === id ? null : id);
+  };
 
 
   useEffect(() => {
@@ -158,15 +169,8 @@ const BhishamDetails = () => {
   const handleItemClick = async (item) => {
     setSelectedItem(item);
     setLoadingItemDetails(true);
-    console.log(item)
 
     try {
-      // Get detailed item information
-      // const response = await getItemDetails(item.id);
-      // console.log(response)
-      // if (response.data) {
-      //   setSelectedItem(response.data);
-      // }
     } catch (error) {
       console.error('Error fetching item details:', error);
     } finally {
@@ -279,6 +283,61 @@ const BhishamDetails = () => {
     }
   };
 
+  const handleDelete = (item) => {
+    console.log('Deleting item:', item);
+    setSelectedItem(item);
+    setLoadingItemDetails(true);
+
+    try {
+    } catch (error) {
+      console.error('Error fetching item details:', error);
+    } finally {
+      setIsDeleteModalOpen(true);
+      setLoadingItemDetails(false);
+    }
+  };
+
+  const handleMarkAsUpdate = (item) => {
+    console.log('Marking item as update:', item);
+    setSelectedItem(item);
+    setLoadingItemDetails(true);
+
+    try {
+    } catch (error) {
+      console.error('Error fetching item details:', error);
+    } finally {
+      setMarkAsUpdateModalOpen(true);
+      setLoadingItemDetails(false);
+    }
+    // Implement your mark as update logic here
+  };
+
+  const handleDeleteItemClose = () => {
+     setIsDeleteModalOpen(false);
+     setSelectedItem("");
+     setDropdownOpen("");
+
+
+  }
+
+  const handleUpdateModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedItem("");
+    setDropdownOpen("");
+
+
+ }
+
+ const handleMarkAsUpdateModalClose = () => {
+  setMarkAsUpdateModalOpen(false);
+  setSelectedItem("");
+  setDropdownOpen("");
+
+
+}
+
+
+  
 
 
 
@@ -331,10 +390,9 @@ const BhishamDetails = () => {
             <span className="text-gray-500">HH Synch Count</span>
             <span className="truncate font-bold text-xl">{bhisham.hh_synch_count || '—'}</span>
           </div>
-          
-          <div className="flex flex-col">
-            <span className="text-gray-500">HH Synch Time</span>
-            <span className="truncate font-bold text-xl">{bhisham.hh_synch_time || '—'}</span>
+          <div>
+            <p className="text-sm text-gray-500">HH_SYNCH_COUNT</p>
+            <p className="font-medium">{bhisham.hh_synch_count || 'Empty'}</p>
           </div>
           
           <div className="flex flex-col">
@@ -489,7 +547,7 @@ const BhishamDetails = () => {
                             {kit.kitname}
                           </p>
                           <p className="text-xs text-gray-500">
-                            <b>Item Size: </b>{kit.total_item} • <b>Exp:</b> {kit.kit_expiry || 'N/A'}
+                            <b>Total Kits: </b>{kit.no_of_kit} • <b>Exp:</b> {kit.kit_expiry || 'N/A'}
                           </p>
                         </div>
                         {icon}
@@ -515,9 +573,8 @@ const BhishamDetails = () => {
           <div className="bg-white rounded-lg shadow-md" style={{ height: '30rem', overflow: 'hidden' }}>
             <div className="p-6 border-b sticky top-0 bg-white z-10 flex justify-between items-center" style={{ padding: '1rem' }}>
               <h3 className="text-lg font-medium text-gray-700">Items</h3>
-              <div className=" flex justify-between items-center gap-5" >  <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />
-
-
+              <div className="flex justify-between items-center gap-5">
+               {bhisham && !bhisham.is_bhisham_close &&  <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />}
                 <input
                   type="text"
                   placeholder="Search Items..."
@@ -525,62 +582,83 @@ const BhishamDetails = () => {
                   onChange={(e) => setSearchTermItems(e.target.value)}
                   className="w-full p-2 border rounded-md"
                   style={{ width: '13rem' }}
-                /> </div>
-
-            </div>
-            {/* <h3 className="text-lg font-medium text-gray-700 mb-4">Items</h3> */}
-            {selectedKit !== null && selectedKit !== undefined ? (loadingItems ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+                />
               </div>
-            ) : filteredItems.length > 0 ? (
-              <ul className="p-6 overflow-y-auto divide-y divide-gray-200" style={{
-                height: 'calc(100% - 7rem)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.7rem'
-              }} >
-                {filteredItems.map((item) => {
-                  const { icon, bgColor } = getItemStatus(item);
-                  return (
+            </div>
 
-                    <li
-                      key={item.id}
-                      className=" hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
-                      onClick={() => handleItemClick(item)}
-                      style={{ padding: '1rem' }}
-                    >
+            {selectedKit !== null && selectedKit !== undefined ? (
+              loadingItems ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredItems.length > 0 ? (
+                <ul
+                  className="p-6 overflow-y-auto divide-y divide-gray-200"
+                  style={{
+                    height: 'calc(100% - 7rem)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.7rem',
+                  }}
+                >
+                  {filteredItems.map((item) => {
+                    const { icon, bgColor } = getItemStatus(item);
+                    return (
+                      <li
+                        key={item.id}
+                        className="hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+                        // onClick={() => handleItemClick(item)}
+                        style={{ padding: '1rem' }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate">{item.sku_name}</p>
+                            <p className="text-xs text-gray-500">
+                              <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
+                            </p>
+                          </div>
+                          {icon}
 
-                      <div className="flex items-center justify-between">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {item.sku_name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
-                          </p>
+                         {bhisham && !bhisham.is_bhisham_close && <div className="relative">
+                            <FiMoreHorizontal
+                              className="ml-2 text-gray-600 cursor-pointer"
+                              onClick={() => toggleDropdown(item.id)}
+                            />
+                            {dropdownOpen === item.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-md">
+                                <ul className="text-sm text-gray-700">
+                                  <li
+                                    className="hover:bg-gray-100 cursor-pointer px-4 py-2"
+                                    onClick={() => handleItemClick(item)}
+                                  >
+                                    Update
+                                  </li>
+                                  <li
+                                    className="hover:bg-gray-100 cursor-pointer px-4 py-2"
+                                    onClick={() => handleMarkAsUpdate(item)}
+                                  >
+                                    Mark as Update
+                                  </li>
+                                  <li
+                                    className="hover:bg-gray-100 cursor-pointer px-4 py-2"
+                                    onClick={() => handleDelete(item.id)}
+                                  >
+                                    Delete
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>}
                         </div>
-                        {/* <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {item.status || 'Unknown'}
-                        </span> */}
-                        {/* <FiInfo className="ml-2 text-primary" /> */}
-                        {icon}
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-gray-500 text-center py-4">No items available for this kit</p>
+              )
             ) : (
-              <p className="text-gray-500 text-center py-4">
-                No items available for this kit
-              </p>
-            )
-            ) : (
-              <p className="text-gray-500 text-center py-4">
-                Select a kit first
-              </p>
+              <p className="text-gray-500 text-center py-4">Select a kit first</p>
             )}
           </div>
         </div>
@@ -590,10 +668,10 @@ const BhishamDetails = () => {
       {/* Item Detail Modal */}
       <ItemDetailModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleUpdateModalClose}
         item={selectedItem}
-        onUpdate={handleItemUpdate}
         bhisham={bhisham}
+        completed={bhisham.is_complete}
       />
 
       <AddItemDialog
@@ -605,6 +683,22 @@ const BhishamDetails = () => {
         kits={kits}
         cube={cubes}
         completed={bhisham.is_complete}
+      />
+
+      <DeleteItemDialog
+         isOpen={isDeleteModalOpen}
+         onClose={handleDeleteItemClose}
+         item={selectedItem}
+         bhisham={bhisham}
+         completed={bhisham.is_complete}
+      />
+
+      <MarkAsUpdateItemDialog
+         isOpen={markAsUpdateModalOpen}
+         onClose={handleMarkAsUpdateModalClose}
+         item={selectedItem}
+         bhisham={bhisham}
+         completed={bhisham.is_complete}
       />
     </div >
   );
