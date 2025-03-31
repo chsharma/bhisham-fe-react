@@ -1,14 +1,22 @@
+
+
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getAllBhisham, completeBhisham } from '../services/api';
-import { FiSearch, FiRefreshCw, FiCheck, FiEye } from 'react-icons/fi';
+import { getAllBhisham, completeBhisham, getBhishamRawData, getBhishamFullData } from '../services/api';
+import { FiSearch, FiRefreshCw, FiCheck, FiEye, FiChevronLeft, FiChevronRight, FiDownload } from 'react-icons/fi';
 
 const ViewBhisham = () => {
   const [bhishamList, setBhishamList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [processingIds, setProcessingIds] = useState([]);
+  const [downloadingIds, setDownloadingIds] = useState({});
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const fetchBhishamList = async () => {
     setLoading(true);
@@ -39,6 +47,11 @@ const ViewBhisham = () => {
   useEffect(() => {
     fetchBhishamList();
   }, []);
+
+  useEffect(() => {
+    // Reset to first page when search term changes
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleComplete = async (id) => {
     setProcessingIds((prev) => [...prev, id]);
@@ -76,9 +89,143 @@ const ViewBhisham = () => {
     (bhisham.created_by?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
-    return (
+  // Get current items for pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredBhisham.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredBhisham.length / itemsPerPage);
+
+  // Pagination handlers
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+  
+  // Handle downloading raw data CSV
+  const handleDownloadRaw = async (id) => {
+    // Update downloading state
+    setDownloadingIds(prev => ({
+      ...prev,
+      [id]: { ...prev[id], raw: true }
+    }));
+    
+    try {
+      const response = await getBhishamRawData(id);
+      
+      if (response && Array.isArray(response.data)) {
+        // Convert data to CSV and download
+        const fileName = "bhisham_raw_" + id + formatDate(new Date());
+        downloadCSV(response.data, fileName);
+        toast.success('Raw data downloaded successfully');
+      } else {
+        toast.error('Failed to get download data');
+      }
+    } catch (error) {
+      console.error('Error downloading raw data:', error);
+      toast.error('Failed to download raw data');
+    } finally {
+      // Reset downloading state
+      setDownloadingIds(prev => ({
+        ...prev,
+        [id]: { ...prev[id], raw: false }
+      }));
+    }
+  };
+  
+  // Handle downloading full data CSV
+  const handleDownloadFull = async (id) => {
+    // Update downloading state
+    setDownloadingIds(prev => ({
+      ...prev,
+      [id]: { ...prev[id], full: true }
+    }));
+    
+    try {
+      const response = await getBhishamFullData(id);
+      
+      if (response && Array.isArray(response.data)) {
+        // Convert data to CSV and download
+        const fileName = "bhisham_full_" + id + formatDate(new Date());
+        downloadCSV(response.data, fileName);
+        toast.success('Full data downloaded successfully');
+      } else {
+        toast.error('Failed to get download data');
+      }
+    } catch (error) {
+      console.error('Error downloading full data:', error);
+      toast.error('Failed to download full data');
+    } finally {
+      // Reset downloading state
+      setDownloadingIds(prev => ({
+        ...prev,
+        [id]: { ...prev[id], full: false }
+      }));
+    }
+  };
+  
+  // Helper function to convert data to CSV and trigger download
+  const downloadCSV = (data, filename) => {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      toast.error('No data to download');
+      return;
+    }
+    
+    // Get headers from the first object
+    const headers = Object.keys(data[0]);
+    
+    // Create CSV rows
+    const csvRows = [];
+    
+    // Add header row
+    csvRows.push(headers.join(','));
+    
+    // Add data rows
+    for (const row of data) {
+      const values = headers.map(header => {
+        const value = row[header];
+        // Handle undefined, null or special characters
+        if (value === null || value === undefined) {
+          return '';
+        }
+        const escaped = String(value).replace(/"/g, '""');
+        // Wrap values with commas or quotes in double quotes
+        return /[,"\n\r]/.test(escaped) ? "${escaped}" : escaped;
+      });
+      csvRows.push(values.join(','));
+    }
+    
+    // Create a CSV string
+    const csvString = csvRows.join('\n');
+    
+    // Create blob and download link
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Append to the body, trigger download, and clean up
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  // Helper function to format date for filename
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  return (
     <div>
-      {/* <h1>test</h1> */}
       <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
         <div className="relative w-full md:w-64">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -138,8 +285,8 @@ const ViewBhisham = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBhisham.length > 0 ? (
-                  filteredBhisham.map((bhisham) => (
+                {currentItems.length > 0 ? (
+                  currentItems.map((bhisham) => (
                     <tr key={bhisham?.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
@@ -165,11 +312,6 @@ const ViewBhisham = () => {
                           {bhisham.is_complete ? 'Complete' : 'Incomplete'}
                         </span>
                       </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {bhisham.complete_time || '-'}
-                        </div>
-                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
                           {!bhisham.is_complete ? (
@@ -195,38 +337,49 @@ const ViewBhisham = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
-                        <Link
-                              to={`/bhisham/${bhisham.id}`}
-                              className="p-1 rounded-md text-blue-600 hover:bg-blue-100"
-                              title="View Details"
-                            >
-                              <FiEye className="h-5 w-5" />
-                            </Link>
-                          {/* {!bhisham.is_complete ? (
-                            <button
-                              onClick={() => handleComplete(bhisham.id)}
-                              disabled={processingIds.includes(bhisham.id)}
-                              className="p-1 rounded-md text-green-600 hover:bg-green-100"
-                              title="Mark as Complete"
-                            >
-                              {processingIds.includes(bhisham.id) ? (
-                                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              ) : (
-                                <FiCheck className="h-5 w-5" />
-                              )}
-                            </button>
-                          ) : (
-                            <Link
-                              to={`/bhisham/${bhisham.id}`}
-                              className="p-1 rounded-md text-blue-600 hover:bg-blue-100"
-                              title="View Details"
-                            >
-                              <FiEye className="h-5 w-5" />
-                            </Link>
-                          )} */}
+                          <Link
+                            to={`/bhisham/${bhisham.id}`}
+                            className="p-1 rounded-md text-blue-600 hover:bg-blue-100"
+                            title="View Details"
+                          >
+                            <FiEye className="h-5 w-5" />
+                          </Link>
+                          <button
+                            onClick={() => handleDownloadRaw(bhisham.id)}
+                            disabled={downloadingIds[bhisham.id]?.raw}
+                            className="p-1 rounded-md text-green-600 hover:bg-green-100"
+                            title="Download Raw Data"
+                          >
+                            {downloadingIds[bhisham.id]?.raw ? (
+                              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <div className="flex items-center">
+                                <FiDownload className="h-5 w-5" />
+                                <span className="ml-1 text-xs">Raw</span>
+                              </div>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDownloadFull(bhisham.id)}
+                            disabled={downloadingIds[bhisham.id]?.full}
+                            className="p-1 rounded-md text-indigo-600 hover:bg-indigo-100"
+                            title="Download Full Data"
+                          >
+                            {downloadingIds[bhisham.id]?.full ? (
+                              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <div className="flex items-center">
+                                <FiDownload className="h-5 w-5" />
+                                <span className="ml-1 text-xs">Full</span>
+                              </div>
+                            )}
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -244,90 +397,104 @@ const ViewBhisham = () => {
             </table>
           </div>
           
+          {/* Pagination Controls */}
+          {filteredBhisham.length > 0 && (
+            <div className="px-6 py-4 flex flex-col sm:flex-row justify-between items-center border-t border-gray-200">
+              <div className="flex items-center mb-4 sm:mb-0">
+                <span className="text-sm text-gray-700">
+                  Showing 
+                  <span className="font-medium mx-1">
+                    {filteredBhisham.length > 0 ? indexOfFirstItem + 1 : 0}
+                  </span>
+                  to
+                  <span className="font-medium mx-1">
+                    {Math.min(indexOfLastItem, filteredBhisham.length)}
+                  </span>
+                  of
+                  <span className="font-medium mx-1">
+                    {filteredBhisham.length}
+                  </span>
+                  entries
+                </span>
+                
+                <div className="ml-4">
+                  <select
+                    className="form-select rounded-md border-gray-300 shadow-sm text-sm"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                  >
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-md ${
+                    currentPage === 1
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FiChevronLeft className="h-5 w-5" />
+                </button>
+                
+                {/* Page Numbers */}
+                <div className="flex space-x-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => {
+                    // Show limited page numbers with ellipsis for large page counts
+                    if (
+                      totalPages <= 7 ||
+                      pageNumber === 1 ||
+                      pageNumber === totalPages ||
+                      (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => handlePageChange(pageNumber)}
+                          className={`px-3 py-1 rounded-md ${
+                            currentPage === pageNumber
+                              ? 'bg-primary text-white'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    } else if (
+                      (pageNumber === 2 && currentPage > 3) ||
+                      (pageNumber === totalPages - 1 && currentPage < totalPages - 2)
+                    ) {
+                      return <span key={pageNumber} className="px-1">...</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className={`p-2 rounded-md ${
+                    currentPage === totalPages || totalPages === 0
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FiChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-        
       )}
     </div>
-
   );
-
-  // return (
-  //   <div className="container mx-auto p-4">
-  //     <div className="flex justify-between items-center mb-6">
-  //       <h1 className="text-2xl font-bold">Bhisham List</h1>
-  //       <div className="flex space-x-2">
-  //         <div className="relative">
-  //           <input
-  //             type="text"
-  //             placeholder="Search Bhisham..."
-  //             className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-  //             value={searchTerm}
-  //             onChange={(e) => setSearchTerm(e.target.value)}
-  //           />
-  //           <FiSearch className="absolute left-3 top-3 text-gray-400" />
-  //         </div>
-  //         <button
-  //           onClick={fetchBhishamList}
-  //           className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-  //         >
-  //           <FiRefreshCw />
-  //         </button>
-  //       </div>
-  //     </div>
-
-  //     {loading ? (
-  //       <div className="flex justify-center items-center h-64">
-  //         <p className="text-lg">Loading...</p>
-  //       </div>
-  //     ) : (
-  //       <div>
-  //         {filteredBhisham.length > 0 ? (
-  //           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-  //             {filteredBhisham.map((bhisham) => (
-  //               <div key={bhisham.id} className="border rounded-lg p-4 shadow-sm">
-  //                 <h2 className="text-xl font-semibold mb-2">{bhisham.bhisham_name}</h2>
-  //                 <div className="space-y-1">
-  //                   <p><strong>Serial No:</strong> {bhisham.serial_no || 'N/A'}</p>
-  //                   <p><strong>Created By:</strong> {bhisham.created_by || 'N/A'}</p>
-  //                   <p><strong>Created At:</strong> {bhisham.created_at ? new Date(bhisham.created_at).toLocaleString() : 'N/A'}</p>
-  //                   <p><strong>Status:</strong> {bhisham.is_complete ? 'Complete' : 'Incomplete'}</p>
-                    
-  //                   {bhisham.is_complete && (
-  //                     <>
-  //                       <p><strong>Completed By:</strong> {bhisham.complete_by || 'N/A'}</p>
-  //                       <p><strong>Complete Time:</strong> {bhisham.complete_time ? new Date(bhisham.complete_time).toLocaleString() : 'N/A'}</p>
-  //                     </>
-  //                   )}
-  //                 </div>
-                  
-  //                 {!bhisham.is_complete && (
-  //                   <button
-  //                     onClick={() => handleComplete(bhisham.id)}
-  //                     disabled={processingIds.includes(bhisham.id)}
-  //                     className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 flex items-center"
-  //                   >
-  //                     {processingIds.includes(bhisham.id) ? 'Processing...' : (
-  //                       <>
-  //                         <FiCheck className="mr-2" />
-  //                         Mark Complete
-  //                       </>
-  //                     )}
-  //                   </button>
-  //                 )}
-  //               </div>
-  //             ))}
-  //           </div>
-  //         ) : (
-  //           <div className="text-center py-10">
-  //             <p className="text-lg text-gray-600">No bhisham records found</p>
-  //           </div>
-  //         )}
-  //       </div>
-  //     )}
-  //   </div>
-  // );
-
-
 };
 
 export default ViewBhisham;

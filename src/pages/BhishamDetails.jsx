@@ -320,7 +320,27 @@ const BhishamDetails = () => {
           </div>
           <div>
             <p className="text-sm text-gray-500">Completed At</p>
-            <p className="font-medium">{bhisham.complete_time}</p>
+            <p className="font-medium">{bhisham.complete_time || 'Empty'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">HH_SYNCH_COUNT</p>
+            <p className="font-medium">{bhisham.hh_synch_count || 'Empty' }</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">HH_Synch_Time</p>
+            <p className="font-medium">{bhisham.hh_synch_time || 'Empty'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">IS_BHISHAM_CLOSE</p>
+            <p className="font-medium">{bhisham.is_bhisham_close || 'Empty'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Close By</p>
+            <p className="font-medium">{bhisham.close_by || 'Empty'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Close Time</p>
+            <p className="font-medium">{bhisham.close_time || 'Empty'}</p>
           </div>
         </div>
       </div>

@@ -68,6 +68,32 @@ export const getAllBhisham = async () => {
   }
 };
 
+// Function to get raw data for a specific bhisham for downloading as CSV
+export const getBhishamRawData = async (bhishamId) => {
+  try {
+    console.log('Fetching raw data for bhisham:', bhishamId);
+    const response = await api.get(`/dashboard/get-mapp-data?bhishamid=${bhishamId}`);
+    console.log('Bhisham raw data response:', response?.data);
+    return response?.data;
+  } catch (error) {
+    console.log('Error fetching bhisham raw data:', error);
+    throw error;
+  }
+};
+
+// Function to get full data for a specific bhisham for downloading as CSV
+export const getBhishamFullData = async (bhishamId) => {
+  try {
+    console.log('Fetching full data for bhisham:', bhishamId);
+    const response = await api.get(`/dashboard/get-mapp-data?bhishamid=${bhishamId}`);
+    console.log('Bhisham full data response:', response?.data);
+    return response?.data;
+  } catch (error) {
+    console.log('Error fetching bhisham full data:', error);
+    throw error;
+  }
+};
+
 export const createBhisham = async (bhishamData) => {
   // For demo: return api.post('/bhisham', bhishamData);
   try {
