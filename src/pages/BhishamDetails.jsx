@@ -301,46 +301,55 @@ const BhishamDetails = () => {
       </div>
 
       {/* Bhisham info card */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h3 className="text-lg font-medium text-gray-700 mb-4">Bhisham Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Created By</p>
-            <p className="font-medium">{bhisham.created_by}</p>
+      <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-medium text-gray-700">Bhisham Information</h3>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            bhisham.is_complete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+          }`}>
+            {bhisham.is_complete ? 'Complete' : 'Incomplete'}
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
+          <div className="flex flex-col">
+            <span className="text-gray-500">Created By</span>
+            <span className="truncate font-bold text-xl">{bhisham.created_by}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Status</p>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              {bhisham.is_complete ? 'Complete' : 'Incomplete'}
-            </span>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">Serial No.</span>
+            <span className="truncate font-bold text-xl">{bhisham.serial_no}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Serial Number</p>
-            <p className="font-medium">{bhisham.serial_no}</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">Completed At</span>
+            <span className="truncate font-bold text-xl">{bhisham.complete_time || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Completed At</p>
-            <p className="font-medium">{bhisham.complete_time || 'Empty'}</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">HH Synch Count</span>
+            <span className="truncate font-bold text-xl">{bhisham.hh_synch_count || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">HH_SYNCH_COUNT</p>
-            <p className="font-medium">{bhisham.hh_synch_count || 'Empty' }</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">HH Synch Time</span>
+            <span className="truncate font-bold text-xl">{bhisham.hh_synch_time || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">HH_Synch_Time</p>
-            <p className="font-medium">{bhisham.hh_synch_time || 'Empty'}</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">Bhisham Close</span>
+            <span className="truncate font-bold text-xl">{bhisham.is_bhisham_close || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">IS_BHISHAM_CLOSE</p>
-            <p className="font-medium">{bhisham.is_bhisham_close || 'Empty'}</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">Close By</span>
+            <span className="truncate font-bold text-xl">{bhisham.close_by || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Close By</p>
-            <p className="font-medium">{bhisham.close_by || 'Empty'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Close Time</p>
-            <p className="font-medium">{bhisham.close_time || 'Empty'}</p>
+          
+          <div className="flex flex-col">
+            <span className="text-gray-500">Close Time</span>
+            <span className="truncate font-bold text-xl">{bhisham.close_time || '—'}</span>
           </div>
         </div>
       </div>
