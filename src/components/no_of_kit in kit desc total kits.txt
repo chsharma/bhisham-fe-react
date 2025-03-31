@@ -1,9 +1,12 @@
 no_of_kit in kit desc total kits 
+
 in delete give dropdown also 
 in item give mark as complete action
 
 
 if bhisam is is_bhisham_close then add delete update no action will be performed 
+
+
 
 
 pagination in bhisham 
