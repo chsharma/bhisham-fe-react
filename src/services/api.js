@@ -22,12 +22,12 @@ api.interceptors.request.use((config) => {
 // Dashboard
 export const getDashboardCounts = async () => {
   console.log('inside this')
-  try{
+  try {
     console.log('Inside api post create User request')
     const response = await api.get('/dashboard/get-stats');
     console.log('user-response', response?.data?.data)
     return response?.data?.data
-  } catch(err) {
+  } catch (err) {
     console.error('Error creating user:', err);
     throw err;
   }
@@ -35,12 +35,35 @@ export const getDashboardCounts = async () => {
 
 export const getUserList = async () => {
   console.log('inside this')
-  try{
+  try {
     console.log('Inside api  Get User request')
     const response = await api.get('user/get-users');
     console.log('user-response', response?.data?.data)
     return response?.data?.data
-  } catch(err) {
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+export const getRoleList = async (user) => {
+  console.log('inside this')
+  try {
+    console.log('Inside api  Get User request')
+    const userData = {
+      name: user.name,
+      login_id: user.login_id,
+      password: user.password,
+      role_id: user.role_id
+
+    }
+    const response = await api.get(`user/get-roles`, {
+      params: userData
+    });
+
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch (err) {
     console.error('Error creating user:', err);
     throw err;
   }
@@ -48,46 +71,48 @@ export const getUserList = async () => {
 
 
 
+
+
 export const createUser = async (userData) => {
 
-    try {
+  try {
     console.log('Inside api post create User request', userData)
     const response = await api.post(`/user/create-user`, JSON.stringify(userData));
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error('Error creating user:', error);
-    throw error; 
+    throw error;
   }
 };
 
 export const updateUser = async (userData) => {
   try {
-  const response = await api.post(`user/update-user`, JSON.stringify(userData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    const response = await api.post(`user/update-user`, JSON.stringify(userData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 export const activeDeactiveUser = async (userData) => {
   try {
-  const response = await api.post(`user/active-deactive`, JSON.stringify(userData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    const response = await api.post(`user/active-deactive`, JSON.stringify(userData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 
 export const getAllBhisham = async () => {
-  try{
+  try {
     console.log('inside bhishams')
     const response = await api.get('/dashboard/get-bhisham');
     console.log('bhisham-response', response?.data)
     return response?.data?.data
-  } catch(error) {
+  } catch (error) {
     console.log('error', error)
   }
 };
@@ -124,10 +149,10 @@ export const createBhisham = async (bhishamData) => {
     console.log('bhisham data', bhishamData)
     const data = await api.post('/bhisham/create', JSON.stringify(bhishamData));
     console.log('created successfully')
-  } catch(error) {
+  } catch (error) {
 
   }
-  return Promise.resolve({ 
+  return Promise.resolve({
     data: {
       ...bhishamData,
       id: Date.now(),
@@ -139,12 +164,12 @@ export const createBhisham = async (bhishamData) => {
 };
 
 export const completeBhisham = async (bhishamId) => {
-  
+
   try {
-    const response = await api.post(`/dashboard/create-data`, {"bhisham_id" : bhishamId})
+    const response = await api.post(`/dashboard/create-data`, { "bhisham_id": bhishamId })
     console.log('cubes response', response.data)
     return response?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
 };
@@ -156,7 +181,7 @@ export const getCubesByMotherBox = async (bhishamId, motherBoxId) => {
     const response = await api.get(`/dashboard/get-cubes?bhishamid=${bhishamId}&mcno=${motherBoxId}`)
     console.log('cubes response', response.data)
     return response?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
 };
@@ -167,7 +192,7 @@ export const getKitsByCube = async (bhishamId, motherBoxId, cubeId) => {
     const response = await api.get(`/dashboard/get-kits?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}`)
     console.log('kit response', response?.data)
     return response?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
   return Promise.resolve({
@@ -183,33 +208,33 @@ export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitName, com
   // For demo: return api.get(dashboard/get-mapping-items?bhishamid=1&mcno=1&ccno=1&kitname=PAIN RELIEF KIT);
   try {
 
-    const response = complete === 1 ? await api.get(`dashboard/get-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) : 
-    await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`)
+    const response = complete === 1 ? await api.get(`dashboard/get-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`) :
+      await api.get(`dashboard/get-mapping-items?bhishamid=${bhishamId}&mcno=${motherBoxId}&ccno=${cubeId}&kitslug=${kitName}`)
     console.log('item response', response?.data)
     return response?.data
-  } catch(err) {
-      console.log('error', err)
+  } catch (err) {
+    console.log('error', err)
   }
   return Promise.resolve({
     data: [
-      { 
-        id: 1, 
+      {
+        id: 1,
         name: 'Item X',
         kitName: 'Kit 1',
         status: 'active',
         expiration: '2025-12-31',
         description: 'Primary component for system operation'
       },
-      { 
-        id: 2, 
+      {
+        id: 2,
         name: 'Item Y',
         kitName: 'Kit 1',
         status: 'active',
         expiration: '2025-10-15',
         description: 'Secondary support component'
       },
-      { 
-        id: 3, 
+      {
+        id: 3,
         name: 'Item Z',
         kitName: 'Kit 1',
         status: 'inactive',
@@ -223,8 +248,8 @@ export const getItemsByKit = async (bhishamId, motherBoxId, cubeId, kitName, com
 export const getItemDetails = async (itemId) => {
   // For demo: return api.get(/items/${itemId});
   const items = [
-    { 
-      id: 1, 
+    {
+      id: 1,
       name: 'Item X',
       kitName: 'Kit 1',
       status: 'active',
@@ -234,8 +259,8 @@ export const getItemDetails = async (itemId) => {
       manufacturer: 'Tech Industries',
       lastUpdated: '2024-02-15'
     },
-    { 
-      id: 2, 
+    {
+      id: 2,
       name: 'Item Y',
       kitName: 'Kit 1',
       status: 'active',
@@ -245,8 +270,8 @@ export const getItemDetails = async (itemId) => {
       manufacturer: 'Tech Industries',
       lastUpdated: '2024-01-20'
     },
-    { 
-      id: 3, 
+    {
+      id: 3,
       name: 'Item Z',
       kitName: 'Kit 1',
       status: 'inactive',
@@ -257,7 +282,7 @@ export const getItemDetails = async (itemId) => {
       lastUpdated: '2023-11-30'
     },
   ];
-  
+
   const item = items.find(i => i.id === itemId) || null;
   return Promise.resolve({ data: item });
 };
@@ -274,7 +299,7 @@ export const updateItem = async (itemId, actionId) => {
   });
 };
 
-export const getAllUser = async(user) => {
+export const getAllUser = async (user) => {
   console.log('user here', user)
   try {
     const userData = {
@@ -282,17 +307,19 @@ export const getAllUser = async(user) => {
       login_id: user.login_id,
       password: user.password,
       role_id: user.role_id
-  
+
     }
-    const response = await api.get(`user/get-users`, JSON.stringify(userData));
-    console.log(response)
+    console.log(userData)
+    const response = await api.get(`user/get-users`, {
+      params: userData
+    }); console.log(response)
     return response?.data?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
 }
 
-export const updatePasswordPageApi = async(loginId, newPassword) => {
+export const updatePasswordPageApi = async (loginId, newPassword) => {
   console.log('user here', loginId, newPassword)
   try {
     const userData = {
@@ -302,18 +329,18 @@ export const updatePasswordPageApi = async(loginId, newPassword) => {
     const response = await api.post(`user/update-password`, JSON.stringify(userData));
     console.log(response)
     return response?.data?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
 }
 
-export const getUpdateDataType = async() => {
+export const getUpdateDataType = async () => {
   try {
- 
+
     const response = await api.get(`dashboard/data-update-type`);
     console.log(response)
     return response?.data?.data
-  } catch(err) {
+  } catch (err) {
     console.log('error', err)
   }
 }
@@ -322,57 +349,57 @@ export const getUpdateDataType = async() => {
 export const createItem = async (itemData, complete) => {
 
   try {
-  console.log('Inside api post create Item request', itemData)
+    console.log('Inside api post create Item request', itemData)
 
-  let url = complete ?   'bhisham/add-bhisham-data' : '/bhisham/add-mapping-data'
-  const response = await api.post(url, JSON.stringify(itemData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    let url = complete ? 'bhisham/add-bhisham-data' : '/bhisham/add-mapping-data'
+    const response = await api.post(url, JSON.stringify(itemData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 export const updateItems = async (itemData, complete) => {
 
   try {
-  console.log('Inside api post update Item request', itemData)
+    console.log('Inside api post update Item request', itemData)
 
-  let url = complete ?   'bhisham/update-data' : '/bhisham/update-mapping-data'
-  const response = await api.post(url, JSON.stringify(itemData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    let url = complete ? 'bhisham/update-data' : '/bhisham/update-mapping-data'
+    const response = await api.post(url, JSON.stringify(itemData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 export const deleteItems = async (itemData, complete) => {
 
   try {
-  console.log('Inside api post delete Item request', itemData)
+    console.log('Inside api post delete Item request', itemData)
 
-  let url = complete ?   'bhisham/delete-bhisham-data' : '/bhisham/delete-mapping-data'
-  const response = await api.post(url, JSON.stringify(itemData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    let url = complete ? 'bhisham/delete-bhisham-data' : '/bhisham/delete-mapping-data'
+    const response = await api.post(url, JSON.stringify(itemData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 export const markAsUpdateItems = async (itemData, complete) => {
 
   try {
-  console.log('Inside api post update Item request', itemData)
+    console.log('Inside api post update Item request', itemData)
 
-  let url = complete ?   'bhisham/mark-update-data' : '/bhisham/mark-update-mapping-data'
-  const response = await api.post(url, JSON.stringify(itemData));
-  return response.data; 
-} catch (error) {
-  console.error('Error creating user:', error);
-  throw error; 
-}
+    let url = complete ? 'bhisham/mark-update-data' : '/bhisham/mark-update-mapping-data'
+    const response = await api.post(url, JSON.stringify(itemData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
 
