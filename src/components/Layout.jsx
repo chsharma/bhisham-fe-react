@@ -128,20 +128,6 @@ const Layout = () => {
                 >
                   Create Users
                 </NavLink>
-                {/* <NavLink
-                  to="/update-user"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                  onClick={navigateToUpdateUser}
-                >
-                  Update Users
-                </NavLink>
-                <NavLink
-                  to="/update-password"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                  onClick={navigateToUpdatePassword}
-                >
-                  Update Password
-                </NavLink> */}
               </div>
             )}
           </div>

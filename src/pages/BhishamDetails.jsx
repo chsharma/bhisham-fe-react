@@ -364,14 +364,14 @@ const BhishamDetails = () => {
         </button>
         <div>
           <h2 className="text-xl font-semibold text-gray-800">{bhisham.name}</h2>
-          <p className="text-sm text-gray-500">Serial: {bhisham.serial_no}</p>
+          <p className="text-3xl text-black">Serial: {bhisham.serial_no}</p>
         </div>
       </div>
 
       {/* Bhishm info card */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-medium text-gray-700">Bhishm Information</h3>
+          <h3 className="text-xl font-medium text-gray-700">Bhishm Information</h3>
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bhisham.is_complete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
             }`}>
             {bhisham.is_complete ? 'Complete' : 'Incomplete'}
