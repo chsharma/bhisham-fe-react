@@ -4,8 +4,9 @@ import { FiUser, FiCheckCircle, FiXCircle, FiClock, FiEdit } from 'react-icons/f
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { activeDeactiveUser, getUserList, updateUser } from '../services/api';
+import { activeDeactiveUser, getAllUser, getRoleList, getUserList, updateUser } from '../services/api';
 import { BsFillPassFill } from 'react-icons/bs';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 const roles = ['Administrator', 'Manager', 'User'];
 
@@ -13,7 +14,7 @@ const GetUsers = () => {
   // const location = useLocation();
   // const { state } = location;
   // const users = state?.data || [];
-
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
@@ -23,11 +24,12 @@ const GetUsers = () => {
   const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({});
+  const [roleList, setRoleList] =  useState([]);
 
    const fetchUserList = async () => {
       setLoading(true);
       try {
-        const response = await getUserList();
+        const response = await getAllUser(user);
         console.log('response from bhisham', response);
   
         // Check if response has data property and it's an array
@@ -42,16 +44,45 @@ const GetUsers = () => {
           toast.error('Received invalid data format from server');
         }
       } catch (error) {
-        toast.error('Failed to fetch Bhisham data');
-        console.error('Error fetching Bhisham:', error);
+        toast.error('Failed to fetch Bhishm data');
+        console.error('Error fetching Bhishm:', error);
         setUserList([]);
       } finally {
         setLoading(false);
       }
     };
+
+    const fetchRoleList = async () => {
+      setLoading(true);
+      try {
+        const response = await getRoleList(user);
+        console.log('response from role list', response);
+  
+        // Check if response has data property and it's an array
+        if (response && response.data && Array.isArray(response.data)) {
+          setRoleList(response.data);
+        } else if (Array.isArray(response)) {
+          // If response is directly an array
+          setRoleList(response);
+        } else {
+          console.error('Unexpected API response format:', response);
+          setRoleList([]);
+          toast.error('Received invalid data format from server');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch Bhishm data');
+        console.error('Error fetching Bhishm:', error);
+        setRoleList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    console.log(roleList)
   
     useEffect(() => {
       fetchUserList();
+      fetchRoleList()
     }, []);
   
 
@@ -61,7 +92,7 @@ const GetUsers = () => {
       name: user.name,
       login_id: user.login_id,
       password: '',
-      role_name: user.role_name,
+      role_id: user.role_id,
     });
     setIsModalOpen(true);
   };
@@ -72,7 +103,7 @@ const GetUsers = () => {
       name: user.name,
       login_id: user.login_id,
       password: '',
-      role_name: user.role_name,
+      role_id: user.role_id,
     });
     setIsPasswordModalOpen(true);
   };
@@ -100,7 +131,7 @@ const GetUsers = () => {
       selectedUser.name = formData.name;
       selectedUser.password = formData.password
       selectedUser.login_id = formData.login_id
-      selectedUser.role_name = formData.role_name
+      selectedUser.role_id = formData.role_id ? parseInt(formData.role_id , 10) : 0;
 
       const response = await updateUser(selectedUser);
 
@@ -108,6 +139,8 @@ const GetUsers = () => {
       toast.success('User updated successfully!');
       setSelectedUser({});
       closeModal();
+      fetchUserList();
+
     } catch (error) {
       toast.error('Failed to update user.');
     }
@@ -126,11 +159,23 @@ const GetUsers = () => {
       setSelectedUser({});
 
       closeConfirmModal();
+      fetchUserList();
+
     } catch (error) {
       toast.error('Failed to update user status.');
     }
   };
-
+  
+  const getRoleName = (roleId) => {
+    if(roleList && roleList.length  > 0 ) {
+      let role  = roleList.find((rl) => rl.id == roleId);
+      if(role ) {
+        return role.name;
+      } else {
+        return "";
+      }
+    }
+  }
 
   return (
     <div className=" bg-gray-50 p-8">
@@ -161,7 +206,7 @@ const GetUsers = () => {
                     {/* <td className="py-4 px-6">{user.user_id}</td> */}
                     <td className="py-4 px-6">{user.name}</td>
                     <td className="py-4 px-6">{user.login_id}</td>
-                    <td className="py-4 px-6">{user.role_name}</td>
+                    <td className="py-4 px-6">{getRoleName(user.role_id) || ""}</td>
                     <td className="py-4 px-6">
                       <span
                         className={`cursor-pointer flex items-center ${user.active ? 'text-green-600' : 'text-red-600'}`}
@@ -207,9 +252,9 @@ const GetUsers = () => {
                   <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="w-full border p-2 rounded" />
                   <input type="text" name="login_id" value={formData.login_id} onChange={handleChange} placeholder="Login ID" className="w-full border p-2 rounded" />
                   {/* <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password (optional)" className="w-full border p-2 rounded" /> */}
-                  <select name="role_name" value={formData.role_name} onChange={handleChange} className="w-full border p-2 rounded">
-                    {roles.map((role) => (
-                      <option key={role} value={role}>{role}</option>
+                  <select name="role_id" value={formData.role_id} onChange={handleChange} className="w-full border p-2 rounded">
+                    {roleList.map((role) => (
+                      <option key={role.id} value={role.id}>{role.name}</option>
                     ))}
                   </select>
                 </div>

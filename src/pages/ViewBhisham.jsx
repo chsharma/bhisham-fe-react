@@ -36,7 +36,7 @@ const ViewBhisham = () => {
         toast.error('Received invalid data format from server');
       }
     } catch (error) {
-      toast.error('Failed to fetch Bhisham data');
+      toast.error('Failed to fetch Bhishm data');
       console.error('Error fetching Bhisham:', error);
       setBhishamList([]);
     } finally {
@@ -62,7 +62,7 @@ const ViewBhisham = () => {
 
       toast.success('Bhishm marked as complete');
     } catch (error) {
-      toast.error('Failed to complete Bhisham');
+      toast.error('Failed to complete Bhishm');
     } finally {
       setProcessingIds((prev) => prev.filter((item) => item !== id));
     }
@@ -228,7 +228,7 @@ const ViewBhisham = () => {
 
         <div className="flex gap-2 w-full md:w-auto">
           <Link to="/create-bhisham" className="btn btn-primary flex-grow md:flex-grow-0">
-            Create New Bhisham
+            Create New Bhishm
           </Link>
           <button
             onClick={fetchBhishamList}
@@ -367,8 +367,8 @@ const ViewBhisham = () => {
                   <tr>
                     <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                       {searchTerm
-                        ? 'No matching Bhisham found'
-                        : 'No Bhisham records available'}
+                        ? 'No matching Bhishm found'
+                        : 'No Bhishm records available'}
                     </td>
                   </tr>
                 )}
