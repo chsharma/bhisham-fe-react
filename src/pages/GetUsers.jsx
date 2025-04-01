@@ -84,7 +84,7 @@ const GetUsers = () => {
     try {
       selectedUser.active = !selectedUser?.active
 
-      let apiData = { "user_id": selectedUser.user_id, active: !selectedUser?.active }
+      let apiData = { "user_id": selectedUser.user_id, active: selectedUser?.active }
 
       const response = await activeDeactiveUser(apiData);
 

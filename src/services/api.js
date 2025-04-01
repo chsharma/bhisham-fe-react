@@ -127,7 +127,7 @@ export const createBhisham = async (bhishamData) => {
 export const completeBhisham = async (bhishamId) => {
   
   try {
-    const response = await api.post(`/dashboard/close-bhisham`, {"bhisham_id" : bhishamId})
+    const response = await api.post(`/dashboard/create-data`, {"bhisham_id" : bhishamId})
     console.log('cubes response', response.data)
     return response?.data
   } catch(err) {
