@@ -13,7 +13,7 @@ const ViewBhisham = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [processingIds, setProcessingIds] = useState([]);
   const [downloadingIds, setDownloadingIds] = useState({});
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -23,7 +23,7 @@ const ViewBhisham = () => {
     try {
       const response = await getAllBhisham();
       console.log('response from bhisham', response);
-      
+
       // Check if response has data property and it's an array
       if (response && response.data && Array.isArray(response.data)) {
         setBhishamList(response.data);
@@ -55,28 +55,14 @@ const ViewBhisham = () => {
 
   const handleComplete = async (id) => {
     setProcessingIds((prev) => [...prev, id]);
-    
+
     try {
       const response = await completeBhisham(id);
-      const updatedBhisham = response.data || response;
-      
-      setBhishamList((prevList) =>
-        prevList.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                is_complete: true,
-                status: updatedBhisham.status,
-                complete_time: updatedBhisham.complete_time,
-              }
-            : item
-        )
-      );
-      
+      fetchBhishamList();
+
       toast.success('Bhishm marked as complete');
     } catch (error) {
       toast.error('Failed to complete Bhisham');
-      console.error('Error completing Bhisham:', error);
     } finally {
       setProcessingIds((prev) => prev.filter((item) => item !== id));
     }
@@ -93,7 +79,7 @@ const ViewBhisham = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredBhisham.slice(indexOfFirstItem, indexOfLastItem);
-  
+
   // Calculate total pages
   const totalPages = Math.ceil(filteredBhisham.length / itemsPerPage);
 
@@ -108,7 +94,7 @@ const ViewBhisham = () => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1); // Reset to first page when changing items per page
   };
-  
+
   // Handle downloading raw data CSV
   const handleDownloadRaw = async (id) => {
     // Update downloading state
@@ -116,10 +102,10 @@ const ViewBhisham = () => {
       ...prev,
       [id]: { ...prev[id], raw: true }
     }));
-    
+
     try {
       const response = await getBhishamRawData(id);
-      
+
       if (response && Array.isArray(response.data)) {
         // Convert data to CSV and download
         const fileName = "bhisham_raw_" + id + formatDate(new Date());
@@ -139,7 +125,7 @@ const ViewBhisham = () => {
       }));
     }
   };
-  
+
   // Handle downloading full data CSV
   const handleDownloadFull = async (id) => {
     // Update downloading state
@@ -147,10 +133,10 @@ const ViewBhisham = () => {
       ...prev,
       [id]: { ...prev[id], full: true }
     }));
-    
+
     try {
       const response = await getBhishamFullData(id);
-      
+
       if (response && Array.isArray(response.data)) {
         // Convert data to CSV and download
         const fileName = "bhisham_full_" + id + formatDate(new Date());
@@ -170,23 +156,23 @@ const ViewBhisham = () => {
       }));
     }
   };
-  
+
   // Helper function to convert data to CSV and trigger download
   const downloadCSV = (data, filename) => {
     if (!data || !Array.isArray(data) || data.length === 0) {
       toast.error('No data to download');
       return;
     }
-    
+
     // Get headers from the first object
     const headers = Object.keys(data[0]);
-    
+
     // Create CSV rows
     const csvRows = [];
-    
+
     // Add header row
     csvRows.push(headers.join(','));
-    
+
     // Add data rows
     for (const row of data) {
       const values = headers.map(header => {
@@ -201,10 +187,10 @@ const ViewBhisham = () => {
       });
       csvRows.push(values.join(','));
     }
-    
+
     // Create a CSV string
     const csvString = csvRows.join('\n');
-    
+
     // Create blob and download link
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -212,13 +198,13 @@ const ViewBhisham = () => {
     link.setAttribute('href', url);
     link.setAttribute('download', `${filename}.csv`);
     link.style.visibility = 'hidden';
-    
+
     // Append to the body, trigger download, and clean up
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-  
+
   // Helper function to format date for filename
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
@@ -239,9 +225,9 @@ const ViewBhisham = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="flex gap-2 w-full md:w-auto">
-          <Link to="/create-bhishm" className="btn btn-primary flex-grow md:flex-grow-0">
+          <Link to="/create-bhisham" className="btn btn-primary flex-grow md:flex-grow-0">
             Create New Bhisham
           </Link>
           <button
@@ -261,54 +247,47 @@ const ViewBhisham = () => {
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full bg-white border rounded-lg shadow-sm">
+              <thead className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
+                  <th className="py-4 px-6">                    Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Serial No
+                  <th className="py-4 px-6">                    Serial No
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created By
+                  <th className="py-4 px-6">                    Created By
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th className="py-4 px-6">                    Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Mark as complete
+                  <th className="py-4 px-6">                    Mark as complete
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className="py-4 px-6">                    Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody>
                 {currentItems.length > 0 ? (
-                  currentItems.map((bhisham) => (
-                    <tr key={bhisham?.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {bhisham?.bhisham_name ? bhisham.bhisham_name : '-'}
-                        </div>
+                  currentItems.map((bhisham, index) => (
+                    <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                      <td className="py-4 px-6">                      
+                          {/* <div className="text-sm font-medium text-gray-900"> */}
+                        {bhisham?.bhisham_name ? bhisham.bhisham_name : '-'}
+                      {/* </div> */}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                      <td className="py-4 px-6">              
+                                  {/* <div className="text-sm text-gray-500"> */}
                           {bhisham?.serial_no}
-                        </div>
+                        {/* </div> */}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                      <td className="py-4 px-6">                      
+                          {/* <div className="text-sm text-gray-500"> */}
                           {bhisham?.created_by}
-                        </div>
+                        {/* </div> */}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          bhisham.is_complete === 1
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bhisham.is_complete === 1
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                          }`}>
                           {bhisham.is_complete ? 'Complete' : 'Incomplete'}
                         </span>
                       </td>
@@ -396,13 +375,13 @@ const ViewBhisham = () => {
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination Controls */}
           {filteredBhisham.length > 0 && (
             <div className="px-6 py-4 flex flex-col sm:flex-row justify-between items-center border-t border-gray-200">
               <div className="flex items-center mb-4 sm:mb-0">
                 <span className="text-sm text-gray-700">
-                  Showing 
+                  Showing
                   <span className="font-medium mx-1">
                     {filteredBhisham.length > 0 ? indexOfFirstItem + 1 : 0}
                   </span>
@@ -416,7 +395,7 @@ const ViewBhisham = () => {
                   </span>
                   entries
                 </span>
-                
+
                 <div className="ml-4">
                   <select
                     className="form-select rounded-md border-gray-300 shadow-sm text-sm"
@@ -430,20 +409,19 @@ const ViewBhisham = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`p-2 rounded-md ${
-                    currentPage === 1
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`p-2 rounded-md ${currentPage === 1
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                 >
                   <FiChevronLeft className="h-5 w-5" />
                 </button>
-                
+
                 {/* Page Numbers */}
                 <div className="flex space-x-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => {
@@ -458,11 +436,10 @@ const ViewBhisham = () => {
                         <button
                           key={pageNumber}
                           onClick={() => handlePageChange(pageNumber)}
-                          className={`px-3 py-1 rounded-md ${
-                            currentPage === pageNumber
-                              ? 'bg-primary text-white'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          }`}
+                          className={`px-3 py-1 rounded-md ${currentPage === pageNumber
+                            ? 'bg-primary text-white'
+                            : 'text-gray-600 hover:bg-gray-100'
+                            }`}
                         >
                           {pageNumber}
                         </button>
@@ -476,15 +453,14 @@ const ViewBhisham = () => {
                     return null;
                   })}
                 </div>
-                
+
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`p-2 rounded-md ${
-                    currentPage === totalPages || totalPages === 0
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`p-2 rounded-md ${currentPage === totalPages || totalPages === 0
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                 >
                   <FiChevronRight className="h-5 w-5" />
                 </button>

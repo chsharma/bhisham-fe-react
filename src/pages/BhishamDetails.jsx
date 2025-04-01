@@ -73,33 +73,36 @@ const BhishamDetails = () => {
   }, [searchTermItems, items]);
 
   // Fetch bhisham details
-  useEffect(() => {
-    const fetchBhishamDetails = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllBhisham();
-        console.log('inside the response array', response)
-        const foundBhisham = response.find(b => b.id === parseInt(id));
 
-        if (foundBhisham) {
-          setBhisham(foundBhisham);
+  const fetchBhishamDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllBhisham();
+      console.log('inside the response array', response)
+      const foundBhisham = response.find(b => b.id === parseInt(id));
 
-          // If bhisham is incomplete, redirect back to view bhisham page
-          if (foundBhisham.status === 'incomplete') {
-            toast.warning('Cannot view details of incomplete Bhisham');
-            navigate('/view-bhisham');
-          }
-        } else {
-          toast.error('Bhisham not found');
+      if (foundBhisham) {
+        setBhisham(foundBhisham);
+
+        // If bhisham is incomplete, redirect back to view bhisham page
+        if (foundBhisham.status === 'incomplete') {
+          toast.warning('Cannot view details of incomplete Bhisham');
           navigate('/view-bhisham');
         }
-      } catch (error) {
-        toast.error('Failed to fetch Bhisham details');
-        console.error('Error fetching Bhisham details:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        toast.error('Bhisham not found');
+        navigate('/view-bhisham');
       }
-    };
+    } catch (error) {
+      toast.error('Failed to fetch Bhisham details');
+      console.error('Error fetching Bhisham details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
 
     fetchBhishamDetails();
   }, [id, navigate]);
@@ -313,9 +316,10 @@ const BhishamDetails = () => {
   };
 
   const handleDeleteItemClose = () => {
-     setIsDeleteModalOpen(false);
-     setSelectedItem("");
-     setDropdownOpen("");
+    setIsDeleteModalOpen(false);
+    setSelectedItem("");
+    setDropdownOpen("");
+    fetchBhishamDetails()
 
 
   }
@@ -324,20 +328,25 @@ const BhishamDetails = () => {
     setIsModalOpen(false);
     setSelectedItem("");
     setDropdownOpen("");
+    fetchBhishamDetails()
 
 
- }
+  }
 
- const handleMarkAsUpdateModalClose = () => {
-  setMarkAsUpdateModalOpen(false);
-  setSelectedItem("");
-  setDropdownOpen("");
+  const handleMarkAsUpdateModalClose = () => {
+    setMarkAsUpdateModalOpen(false);
+    setSelectedItem("");
+    setDropdownOpen("");
+    fetchBhishamDetails()
+  }
+
+  const handleAddModalClose = () => {
+    setIsAddModalOpen(false);
+    setDropdownOpen("");
+    fetchBhishamDetails()
+  }
 
 
-}
-
-
-  
 
 
 
@@ -363,29 +372,28 @@ const BhishamDetails = () => {
       <div className="bg-white rounded-lg shadow-md p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-medium text-gray-700">Bhisham Information</h3>
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            bhisham.is_complete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-          }`}>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bhisham.is_complete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+            }`}>
             {bhisham.is_complete ? 'Complete' : 'Incomplete'}
           </span>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
           <div className="flex flex-col">
             <span className="text-gray-500">Created By</span>
             <span className="truncate font-bold text-xl">{bhisham.created_by}</span>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">Serial No.</span>
             <span className="truncate font-bold text-xl">{bhisham.serial_no}</span>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">Completed At</span>
             <span className="truncate font-bold text-xl">{bhisham.complete_time || '—'}</span>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">HH Synch Count</span>
             <span className="truncate font-bold text-xl">{bhisham.hh_synch_count || '—'}</span>
@@ -394,17 +402,17 @@ const BhishamDetails = () => {
             <p className="text-sm text-gray-500">HH_SYNCH_COUNT</p>
             <p className="font-medium">{bhisham.hh_synch_count || 'Empty'}</p>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">Bhisham Close</span>
             <span className="truncate font-bold text-xl">{bhisham.is_bhisham_close || '—'}</span>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">Close By</span>
             <span className="truncate font-bold text-xl">{bhisham.close_by || '—'}</span>
           </div>
-          
+
           <div className="flex flex-col">
             <span className="text-gray-500">Close Time</span>
             <span className="truncate font-bold text-xl">{bhisham.close_time || '—'}</span>
@@ -574,7 +582,7 @@ const BhishamDetails = () => {
             <div className="p-6 border-b sticky top-0 bg-white z-10 flex justify-between items-center" style={{ padding: '1rem' }}>
               <h3 className="text-lg font-medium text-gray-700">Items</h3>
               <div className="flex justify-between items-center gap-5">
-               {bhisham && !bhisham.is_bhisham_close &&  <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />}
+                {bhisham && !bhisham.is_bhisham_close && <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />}
                 <input
                   type="text"
                   placeholder="Search Items..."
@@ -619,7 +627,7 @@ const BhishamDetails = () => {
                           </div>
                           {icon}
 
-                         {bhisham && !bhisham.is_bhisham_close && <div className="relative">
+                          {bhisham && !bhisham.is_bhisham_close && <div className="relative">
                             <FiMoreHorizontal
                               className="ml-2 text-gray-600 cursor-pointer"
                               onClick={() => toggleDropdown(item.id)}
@@ -676,7 +684,7 @@ const BhishamDetails = () => {
 
       <AddItemDialog
         isOpen={iAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={handleAddModalClose}
         // onUpdate={handleItemUpdate}
         selectedKitName={selectedKitName}
         selectedCube={selectedCube}
@@ -686,19 +694,19 @@ const BhishamDetails = () => {
       />
 
       <DeleteItemDialog
-         isOpen={isDeleteModalOpen}
-         onClose={handleDeleteItemClose}
-         item={selectedItem}
-         bhisham={bhisham}
-         completed={bhisham.is_complete}
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteItemClose}
+        item={selectedItem}
+        bhisham={bhisham}
+        completed={bhisham.is_complete}
       />
 
       <MarkAsUpdateItemDialog
-         isOpen={markAsUpdateModalOpen}
-         onClose={handleMarkAsUpdateModalClose}
-         item={selectedItem}
-         bhisham={bhisham}
-         completed={bhisham.is_complete}
+        isOpen={markAsUpdateModalOpen}
+        onClose={handleMarkAsUpdateModalClose}
+        item={selectedItem}
+        bhisham={bhisham}
+        completed={bhisham.is_complete}
       />
     </div >
   );

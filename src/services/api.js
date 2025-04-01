@@ -56,6 +56,16 @@ export const updateUser = async (userData) => {
 }
 };
 
+export const activeDeactiveUser = async (userData) => {
+  try {
+  const response = await api.post(`user/active-deactive`, JSON.stringify(userData));
+  return response.data; 
+} catch (error) {
+  console.error('Error creating user:', error);
+  throw error; 
+}
+};
+
 
 export const getAllBhisham = async () => {
   try{
@@ -72,7 +82,7 @@ export const getAllBhisham = async () => {
 export const getBhishamRawData = async (bhishamId) => {
   try {
     console.log('Fetching raw data for bhisham:', bhishamId);
-    const response = await api.get(`/dashboard/get-mapp-data?bhishamid=${bhishamId}`);
+    const response = await api.get(`/handheld/get-all-data?bhishamid=${bhishamId}`);
     console.log('Bhisham raw data response:', response?.data);
     return response?.data;
   } catch (error) {
@@ -115,14 +125,14 @@ export const createBhisham = async (bhishamData) => {
 };
 
 export const completeBhisham = async (bhishamId) => {
-  // For demo: return api.put(/bhisham/${bhishamId}/complete);
-  return Promise.resolve({ 
-    data: {
-      id: bhishamId,
-      status: 'complete',
-      complete_time: new Date().toISOString().replace('T', ' ').substr(0, 19)
-    }
-  });
+  
+  try {
+    const response = await api.post(`/dashboard/close-bhisham`, {"bhisham_id" : bhishamId})
+    console.log('cubes response', response.data)
+    return response?.data
+  } catch(err) {
+    console.log('error', err)
+  }
 };
 
 // MotherBox and Cubes management

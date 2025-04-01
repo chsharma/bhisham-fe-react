@@ -4,7 +4,8 @@ import { FiUser, FiCheckCircle, FiXCircle, FiClock, FiEdit } from 'react-icons/f
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { updateUser } from '../services/api';
+import { activeDeactiveUser, updateUser } from '../services/api';
+import { BsFillPassFill } from 'react-icons/bs';
 
 const roles = ['Administrator', 'Manager', 'User'];
 
@@ -14,6 +15,8 @@ const GetUsers = () => {
   const users = state?.data || [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -30,7 +33,20 @@ const GetUsers = () => {
     setIsModalOpen(true);
   };
 
+  const openPasswordModal = (user) => {
+    setSelectedUser(user);
+    setFormData({
+      name: user.name,
+      login_id: user.login_id,
+      password: '',
+      role_name: user.role_name,
+    });
+    setIsPasswordModalOpen(true);
+  };
+
   const closeModal = () => setIsModalOpen(false);
+  const closePasswordModal = () => setIsPasswordModalOpen(false);
+
 
   const openConfirmModal = (user) => {
     setSelectedUser(user);
@@ -68,7 +84,9 @@ const GetUsers = () => {
     try {
       selectedUser.active = !selectedUser?.active
 
-      const response = await updateUser(selectedUser);
+      let apiData = { "user_id": selectedUser.user_id, active: !selectedUser?.active }
+
+      const response = await activeDeactiveUser(apiData);
 
       // await axios.post(`https://api.gryfontech.com/v1/api/user/update-user`, { active: !selectedUser.active });
       toast.success(`User ${selectedUser.active ? 'deactivated' : 'activated'} successfully!`);
@@ -87,14 +105,15 @@ const GetUsers = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
           <FiUser className="mr-2 text-primary" /> User List
         </h1>
-        
+
+
 
         {users.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border rounded-lg shadow-sm">
               <thead className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <tr>
-                  <th className="py-4 px-6">User ID</th>
+                  {/* <th className="py-4 px-6">User ID</th> */}
                   <th className="py-4 px-6">Name</th>
                   <th className="py-4 px-6">Login ID</th>
                   <th className="py-4 px-6">Role</th>
@@ -106,7 +125,7 @@ const GetUsers = () => {
               <tbody>
                 {users.map((user, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="py-4 px-6">{user.user_id}</td>
+                    {/* <td className="py-4 px-6">{user.user_id}</td> */}
                     <td className="py-4 px-6">{user.name}</td>
                     <td className="py-4 px-6">{user.login_id}</td>
                     <td className="py-4 px-6">{user.role_name}</td>
@@ -127,10 +146,14 @@ const GetUsers = () => {
                     </td> */}
                     <td className="py-4 px-6">{new Date(user.created_at).toLocaleString()}</td>
                     <td className="py-4 px-6">
-                      <button onClick={() => openModal(user)} className="text-blue-500">
+                      <button onClick={() => openModal(user)} className="text-blue-500 mr-5">
                         <FiEdit /> Edit
                       </button>
+                      <button onClick={() => openPasswordModal(user)} className="text-blue-500">
+                        <BsFillPassFill /> Password
+                      </button>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -150,7 +173,7 @@ const GetUsers = () => {
                 <div className="mt-4 space-y-4">
                   <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="w-full border p-2 rounded" />
                   <input type="text" name="login_id" value={formData.login_id} onChange={handleChange} placeholder="Login ID" className="w-full border p-2 rounded" />
-                  <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password (optional)" className="w-full border p-2 rounded" />
+                  {/* <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password (optional)" className="w-full border p-2 rounded" /> */}
                   <select name="role_name" value={formData.role_name} onChange={handleChange} className="w-full border p-2 rounded">
                     {roles.map((role) => (
                       <option key={role} value={role}>{role}</option>
@@ -160,6 +183,27 @@ const GetUsers = () => {
 
                 <div className="mt-6 flex justify-end space-x-4">
                   <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                  <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+                </div>
+              </Dialog.Panel>
+            </div>
+          </Dialog>
+        </Transition>
+
+
+        {/* Edit PASSWORD Modal */}
+        <Transition appear show={isPasswordModalOpen} as={React.Fragment}>
+          <Dialog onClose={closePasswordModal} className="fixed inset-0 z-10 overflow-y-auto">
+            <div className="min-h-screen flex items-center justify-center">
+              <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                <Dialog.Title className="text-xl font-semibold">Edit Password</Dialog.Title>
+
+                <div className="mt-4 space-y-4">
+                  <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password (optional)" className="w-full border p-2 rounded" />
+                </div>
+
+                <div className="mt-6 flex justify-end space-x-4">
+                  <button onClick={closePasswordModal} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
                   <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
                 </div>
               </Dialog.Panel>
@@ -183,6 +227,7 @@ const GetUsers = () => {
             </div>
           </Dialog>
         </Transition>
+        
       </div>
     </div>
   );

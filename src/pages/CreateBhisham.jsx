@@ -26,7 +26,11 @@ const CreateBhisham = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        await createBhisham(values);
+        let data = {
+          "bhisham_name" : values.name,
+          "serial_no" : values.serial_no
+        }
+        await createBhisham(data);
         toast.success('Bhisham created successfully');
         // Navigate to view bhisham page after successful creation
         navigate('/view-bhisham');
