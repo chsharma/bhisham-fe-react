@@ -33,6 +33,20 @@ export const getDashboardCounts = async () => {
   }
 };
 
+export const getUserList = async () => {
+  console.log('inside this')
+  try{
+    console.log('Inside api  Get User request')
+    const response = await api.get('user/get-users');
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch(err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+
 
 export const createUser = async (userData) => {
 

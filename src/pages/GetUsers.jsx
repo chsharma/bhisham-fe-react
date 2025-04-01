@@ -1,26 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FiUser, FiCheckCircle, FiXCircle, FiClock, FiEdit } from 'react-icons/fi';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { activeDeactiveUser, updateUser } from '../services/api';
+import { activeDeactiveUser, getUserList, updateUser } from '../services/api';
 import { BsFillPassFill } from 'react-icons/bs';
 
 const roles = ['Administrator', 'Manager', 'User'];
 
 const GetUsers = () => {
-  const location = useLocation();
-  const { state } = location;
-  const users = state?.data || [];
+  // const location = useLocation();
+  // const { state } = location;
+  // const users = state?.data || [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [users, setUserList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({});
+
+   const fetchUserList = async () => {
+      setLoading(true);
+      try {
+        const response = await getUserList();
+        console.log('response from bhisham', response);
+  
+        // Check if response has data property and it's an array
+        if (response && response.data && Array.isArray(response.data)) {
+          setUserList(response.data);
+        } else if (Array.isArray(response)) {
+          // If response is directly an array
+          setUserList(response);
+        } else {
+          console.error('Unexpected API response format:', response);
+          setUserList([]);
+          toast.error('Received invalid data format from server');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch Bhisham data');
+        console.error('Error fetching Bhisham:', error);
+        setUserList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      fetchUserList();
+    }, []);
+  
 
   const openModal = (user) => {
     setSelectedUser(user);
