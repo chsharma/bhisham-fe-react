@@ -66,7 +66,12 @@ const Layout = () => {
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
 
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHAM App</h2>
+          {/* <h2 className="text-3xl font-extrabold text-white tracking-wide">Bhishm App</h2> */}
+          <img 
+            src="image.jpeg"// Replace "logo.png" with your actual image file name
+            alt="Bhishm App Logo" 
+            className="h-auto w-auto" // Adjust height/width as needed
+          />
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
@@ -148,7 +153,7 @@ const Layout = () => {
             >
               <div className="flex items-center gap-4">
                 <FiPackage className="w-6 h-6" />
-                <span className="text-lg font-medium">Bhisham</span>
+                <span className="text-lg font-medium">Bhishm</span>
               </div>
               <FiChevronDown
                 className={`transition-transform duration-300 ${
@@ -163,13 +168,13 @@ const Layout = () => {
                   to="/view-bhisham"
                   className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
                 >
-                  View Bhisham
+                  View Bhishm
                 </NavLink>
                 <NavLink
                   to="/create-bhisham"
                   className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
                 >
-                  Create Bhisham
+                  Create Bhishm
                 </NavLink>
               </div>
             )}
@@ -208,8 +213,8 @@ const Layout = () => {
           <h1 className="text-4xl font-bold text-gray-800">
             {location.pathname === '/' && 'Dashboard'}
             {location.pathname === '/create-user' && 'Create User'}
-            {location.pathname === '/view-bhisham' && 'View Bhisham'}
-            {location.pathname === '/create-bhisham' && 'Create Bhisham'}
+            {location.pathname === '/view-bhisham' && 'View Bhishm'}
+            {location.pathname === '/create-bhisham' && 'Create Bhishm'}
           </h1>
 
           {/* User Profile Section */}

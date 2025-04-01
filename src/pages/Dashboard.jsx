@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom';
 import { getDashboardCounts } from '../services/api';
 import { FiPackage, FiBox, FiLayers, FiGrid } from 'react-icons/fi';
 
-const DashboardCard = ({ title, count, icon: Icon, color }) => (
+const DashboardCard = ({ title, count, icon, color }) => (
   <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-100">
     <div className="flex items-center space-x-4">
-      <div className={`p-4 rounded-full ${color} bg-opacity-10`}>
-        <Icon className={`${color.replace('bg', 'text')} h-8 w-8`} />
+      <div className={`p-4 rounded-full bg-opacity-10 flex items-center justify-center w-20 h-20 overflow-hidden`}>
+        <img 
+          src={icon}
+          alt={title}
+          className="object-cover w-auto h-auto"
+        />
       </div>
       <div>
         <h3 className="text-lg font-medium text-gray-700">{title}</h3>
@@ -59,28 +63,29 @@ const Dashboard = () => {
         {/* Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
-            title="Bhisham"
+            title="Bhishm"
             count={counts.bhisham}
-            icon={FiPackage}
+            icon="bhishm.jpeg"
             color="bg-blue-500"
           />
           <DashboardCard
             title="Mother Cube"
             count={counts.mc}
-            icon={FiGrid}
+            icon="mother_cube.jpeg"
             color="bg-red-500"
-          />
-          <DashboardCard
-            title="Kits"
-            count={counts.kits}
-            icon={FiLayers}
-            color="bg-purple-500"
           />
           <DashboardCard
             title="Child Cube"
             count={counts.cc}
-            icon={FiBox}
+            icon="child_cube.jpeg"
             color="bg-green-500"
+          />
+
+          <DashboardCard
+            title="Kits"
+            count={counts.kits}
+            icon="kit.jpeg"
+            color="bg-purple-500"
           />
         </div>
 
@@ -91,10 +96,10 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <Link to="create-bhisham" className="bg-primary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-primary-dark transition">
-                Create New Bhisham
+                Create New Bhishm
               </Link>
               <Link to="view-bhisham" className="bg-secondary text-white py-3 px-6 rounded-lg text-center shadow-md hover:bg-secondary-dark transition">
-                View All Bhisham
+                View All Bhishm
               </Link>
               <Link to="create-user" className="bg-accent text-dark py-3 px-6 rounded-lg text-center shadow-md hover:bg-accent-dark transition">
                 Create New User
