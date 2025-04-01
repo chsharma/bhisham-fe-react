@@ -148,7 +148,7 @@ const Layout = () => {
             >
               <div className="flex items-center gap-4">
                 <FiPackage className="w-6 h-6" />
-                <span className="text-lg font-medium">Bhisham</span>
+                <span className="text-lg font-medium">Bhishm</span>
               </div>
               <FiChevronDown
                 className={`transition-transform duration-300 ${
@@ -163,13 +163,13 @@ const Layout = () => {
                   to="/view-bhisham"
                   className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
                 >
-                  View Bhisham
+                  View Bhishm
                 </NavLink>
                 <NavLink
                   to="/create-bhisham"
                   className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
                 >
-                  Create Bhisham
+                  Create Bhishm
                 </NavLink>
               </div>
             )}
@@ -208,8 +208,8 @@ const Layout = () => {
           <h1 className="text-4xl font-bold text-gray-800">
             {location.pathname === '/' && 'Dashboard'}
             {location.pathname === '/create-user' && 'Create User'}
-            {location.pathname === '/view-bhisham' && 'View Bhisham'}
-            {location.pathname === '/create-bhisham' && 'Create Bhisham'}
+            {location.pathname === '/view-bhisham' && 'View Bhishm'}
+            {location.pathname === '/create-bhisham' && 'Create Bhishm'}
           </h1>
 
           {/* User Profile Section */}
