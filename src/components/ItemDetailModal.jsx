@@ -72,6 +72,7 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
       await updateItems( data, completed);
       toast.success('Item updated successfully!');
       setFormData({});
+      setIsEditing(false)
       onClose();
     } catch (error) {
       toast.error('Failed to update item');
