@@ -49,7 +49,7 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary">BHISHM App</h1>
+            <h1 className="text-3xl font-bold text-primary">BHISHM <span style = {{color : "black"}}>CUBE ONLINE</span> </h1>
             <p className="text-gray-500 mt-2">Login to your account</p>
           </div>
           
@@ -88,6 +88,7 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="input pl-10"
                   placeholder="Enter your password"
+                  
                 />
               </div>
             </div>
@@ -110,6 +111,16 @@ const Login = () => {
           <div className="mt-6 text-center text-sm text-gray-500">
             <p>For demo purposes, you can use any username and password</p>
           </div>
+
+          <img 
+            src="image.jpeg"// Replace "logo.png" with your actual image file name
+            alt="Bhishm App Logo" 
+            className="h-auto w-auto" // Adjust height/width as needed
+            style ={{margin: 'auto',
+              height: '5rem',
+              marginTop: '1rem'}}
+          />
+
         </div>
       </div>
     </div>
