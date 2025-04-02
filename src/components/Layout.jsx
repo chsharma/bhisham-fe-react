@@ -66,7 +66,12 @@ const Layout = () => {
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
 
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHAM App</h2>
+          {/* <h2 className="text-3xl font-extrabold text-white tracking-wide">Bhishm App</h2> */}
+          <img 
+            src="image.jpeg"// Replace "logo.png" with your actual image file name
+            alt="Bhishm App Logo" 
+            className="h-auto w-auto" // Adjust height/width as needed
+          />
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
@@ -123,20 +128,6 @@ const Layout = () => {
                 >
                   Create Users
                 </NavLink>
-                {/* <NavLink
-                  to="/update-user"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                  onClick={navigateToUpdateUser}
-                >
-                  Update Users
-                </NavLink>
-                <NavLink
-                  to="/update-password"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                  onClick={navigateToUpdatePassword}
-                >
-                  Update Password
-                </NavLink> */}
               </div>
             )}
           </div>

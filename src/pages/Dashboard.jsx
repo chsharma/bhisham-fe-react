@@ -3,15 +3,19 @@ import { Link } from 'react-router-dom';
 import { getDashboardCounts } from '../services/api';
 import { FiPackage, FiBox, FiLayers, FiGrid } from 'react-icons/fi';
 
-const DashboardCard = ({ title, count, icon: Icon, color }) => (
+const DashboardCard = ({ title, count, icon, color }) => (
   <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-100">
-    <div className="flex items-center space-x-4">
-      <div className={`p-4 rounded-full ${color} bg-opacity-10`}>
-        <Icon className={`${color.replace('bg', 'text')} h-8 w-8`} />
+    <div className="flex items-center space-x-6">
+      <div className={`p-3 rounded-lg ${color || 'bg-blue-50'} flex items-center justify-center w-20 h-20`}>
+        <img 
+          src={icon}
+          alt={title}
+          className="object-contain max-w-full max-h-full"
+        />
       </div>
       <div>
-        <h3 className="text-lg font-medium text-gray-700">{title}</h3>
-        <p className="text-3xl font-bold text-gray-900">{count}</p>
+        <h3 className="text-lg font-medium text-gray-600 mb-1">{title}</h3>
+        <p className="text-4xl font-bold text-gray-900">{count.toLocaleString()}</p>
       </div>
     </div>
   </div>
@@ -61,26 +65,27 @@ const Dashboard = () => {
           <DashboardCard
             title="Bhishm"
             count={counts.bhisham}
-            icon={FiPackage}
+            icon="bhishm.jpeg"
             color="bg-blue-500"
           />
           <DashboardCard
             title="Mother Cube"
             count={counts.mc}
-            icon={FiGrid}
+            icon="mother_cube.jpeg"
             color="bg-red-500"
-          />
-          <DashboardCard
-            title="Kits"
-            count={counts.kits}
-            icon={FiLayers}
-            color="bg-purple-500"
           />
           <DashboardCard
             title="Child Cube"
             count={counts.cc}
-            icon={FiBox}
+            icon="child_cube.jpeg"
             color="bg-green-500"
+          />
+
+          <DashboardCard
+            title="Kits"
+            count={counts.kits}
+            icon="kit.jpeg"
+            color="bg-purple-500"
           />
         </div>
 

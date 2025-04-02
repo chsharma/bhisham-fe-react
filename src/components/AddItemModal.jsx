@@ -47,7 +47,7 @@ const ItemDetailModal = ({ isOpen, onClose, selectedKitName, selectedCube, kits,
             const selCube = cube.find((c) => c.cube_number == selectedCube);
 
             formData.mc_no = selCube.mc_no;
-            formData.id = selCube.mc_no;
+            formData.id = selCube.bhisham_id;
             formData.kit_code = selKit.kitcode;
             formData.cube_number = selCube.cube_number;
             formData.kit_name = selKit.kitname;

@@ -122,7 +122,7 @@ export const getBhishamRawData = async (bhishamId) => {
   try {
     console.log('Fetching raw data for bhisham:', bhishamId);
     const response = await api.get(`/handheld/get-all-data?bhishamid=${bhishamId}`);
-    console.log('Bhisham raw data response:', response?.data);
+    console.log('Bhishm raw data response:', response?.data);
     return response?.data;
   } catch (error) {
     console.log('Error fetching bhisham raw data:', error);
@@ -135,7 +135,7 @@ export const getBhishamFullData = async (bhishamId) => {
   try {
     console.log('Fetching full data for bhisham:', bhishamId);
     const response = await api.get(`/dashboard/get-mapp-data?bhishamid=${bhishamId}`);
-    console.log('Bhisham full data response:', response?.data);
+    console.log('Bhishm full data response:', response?.data);
     return response?.data;
   } catch (error) {
     console.log('Error fetching bhisham full data:', error);

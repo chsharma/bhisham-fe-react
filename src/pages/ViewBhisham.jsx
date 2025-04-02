@@ -37,7 +37,7 @@ const ViewBhisham = () => {
       }
     } catch (error) {
       toast.error('Failed to fetch Bhishm data');
-      console.error('Error fetching Bhisham:', error);
+      console.error('Error fetching Bhishm:', error);
       setBhishamList([]);
     } finally {
       setLoading(false);

@@ -12,7 +12,7 @@ const CreateBhisham = () => {
 
   // Form validation schema
   const validationSchema = Yup.object({
-    name: Yup.string().required('Bhisham name is required'),
+    name: Yup.string().required('Bhishm name is required'),
     serial_no: Yup.string().required('Serial number is required'),
   });
 
@@ -31,12 +31,12 @@ const CreateBhisham = () => {
           "serial_no" : values.serial_no
         }
         await createBhisham(data);
-        toast.success('Bhisham created successfully');
+        toast.success('Bhishm created successfully');
         // Navigate to view bhisham page after successful creation
         navigate('/view-bhisham');
       } catch (error) {
-        toast.error('Failed to create Bhisham');
-        console.error('Error creating Bhisham:', error);
+        toast.error('Failed to create Bhishm');
+        console.error('Error creating Bhishm:', error);
       } finally {
         setLoading(false);
       }
@@ -49,7 +49,7 @@ const CreateBhisham = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-6">Create New Bhishm</h2>
         
         <form onSubmit={formik.handleSubmit} className="space-y-6">
-          {/* Bhisham Name Field */}
+          {/* Bhishm Name Field */}
           <div>
             <label htmlFor="name" className="label">
               Bhishm Name
