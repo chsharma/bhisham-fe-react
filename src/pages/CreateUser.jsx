@@ -3,10 +3,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { createUser } from '../services/api';
-import { FiUser, FiLock, FiMail, FiShield } from 'react-icons/fi';
+import { FiUser, FiLock, FiMail, FiShield, FiEye, FiEyeOff } from 'react-icons/fi';
 
 const CreateUser = () => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Form validation schema
   const validationSchema = Yup.object({
@@ -30,6 +31,8 @@ const CreateUser = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
+        values.role_id = values.role_id ? parseInt( values.role_id, 10) : 0;
+
         await createUser(values);
         toast.success('User created successfully');
         formik.resetForm();
@@ -106,11 +109,17 @@ const CreateUser = () => {
               <input
                 id="password"
                 name="password"
-                type="password"
-                className="input pl-10"
+                type={showPassword ? 'text' : 'password'}
+                className="input pl-10 pr-10"
                 placeholder="Enter password"
                 {...formik.getFieldProps('password')}
               />
+              <div
+                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FiEyeOff className="text-gray-400" /> : <FiEye className="text-gray-400" />}
+              </div>
             </div>
             {formik.touched.password && formik.errors.password ? (
               <div className="text-sm text-red-600 mt-1">{formik.errors.password}</div>
