@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { activeDeactiveUser, getAllUser, getRoleList, getUserList, updateUsePassword, updateUser } from '../services/api';
 import { BsFillPassFill } from 'react-icons/bs';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
-
+import { FiEye, FiEyeOff } from "react-icons/fi";
 const roles = ['Administrator', 'Manager', 'User'];
 
 const GetUsers = () => {
@@ -19,6 +19,7 @@ const GetUsers = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [users, setUserList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +27,7 @@ const GetUsers = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const [formData, setFormData] = useState({});
-  const [roleList, setRoleList] =  useState([]);
+  const [roleList, setRoleList] = useState([]);
 
   const fetchUserList = async () => {
     setLoading(true);
@@ -158,7 +159,7 @@ const GetUsers = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
 
   const handleSubmit = async () => {
@@ -168,7 +169,7 @@ const GetUsers = () => {
       selectedUser.name = formData.name;
       selectedUser.password = formData.password
       selectedUser.login_id = formData.login_id
-      selectedUser.role_id = formData.role_id ? parseInt(formData.role_id , 10) : 0;
+      selectedUser.role_id = formData.role_id ? parseInt(formData.role_id, 10) : 0;
 
       const response = await updateUser(selectedUser);
 
@@ -187,10 +188,13 @@ const GetUsers = () => {
   const handlePasswordUpdate = async () => {
     try {
 
-      selectedUser.password = formData.password
-      selectedUser.login_id = formData.login_id
+      let data = {}
 
-      const response = await updateUsePassword(selectedUser);
+      data.password = formData.password
+      console.log(user)
+      data.login_id = user.user_id
+
+      const response = await updateUsePassword(data);
 
       // await axios.post(`https://api.gryfontech.com/v1/api/user/update-user`, formData);
       toast.success('User Password updated successfully!');
@@ -202,7 +206,7 @@ const GetUsers = () => {
       toast.error('Failed to update user.');
     }
   };
-  
+
 
   const handleStatusUpdate = async () => {
     try {
@@ -223,11 +227,11 @@ const GetUsers = () => {
       toast.error('Failed to update user status.');
     }
   };
-  
+
   const getRoleName = (roleId) => {
-    if(roleList && roleList.length > 0) {
+    if (roleList && roleList.length > 0) {
       let role = roleList.find((rl) => rl.id == roleId);
-      if(role) {
+      if (role) {
         return role.name;
       } else {
         return "";
@@ -239,7 +243,7 @@ const GetUsers = () => {
   // Generate pagination buttons
   const renderPaginationButtons = () => {
     const buttons = [];
-    
+
     // Always show first page
     buttons.push(
       <button
@@ -250,17 +254,17 @@ const GetUsers = () => {
         1
       </button>
     );
-    
+
     // If there are many pages, add ellipsis and show a window around current page
     if (totalPages > 7) {
       if (currentPage > 3) {
         buttons.push(<span key="ellipsis1" className="px-2">...</span>);
       }
-      
+
       // Show a window of pages around the current page
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
-      
+
       for (let i = startPage; i <= endPage; i++) {
         buttons.push(
           <button
@@ -272,7 +276,7 @@ const GetUsers = () => {
           </button>
         );
       }
-      
+
       if (currentPage < totalPages - 2) {
         buttons.push(<span key="ellipsis2" className="px-2">...</span>);
       }
@@ -290,7 +294,7 @@ const GetUsers = () => {
         );
       }
     }
-    
+
     // Always show last page if there's more than 1 page
     if (totalPages > 1) {
       buttons.push(
@@ -303,7 +307,7 @@ const GetUsers = () => {
         </button>
       );
     }
-    
+
     return buttons;
   };
 
@@ -319,7 +323,7 @@ const GetUsers = () => {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
                 <span className="mr-2">Show</span>
-                <select 
+                <select
                   className="border rounded px-2 py-1"
                   value={usersPerPage}
                   onChange={handlePerPageChange}
@@ -331,7 +335,7 @@ const GetUsers = () => {
                 </select>
                 <span className="ml-2">entries</span>
               </div>
-              
+
               <div>
                 <span className="text-gray-600">
                   Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, users.length)} of {users.length} entries
@@ -362,7 +366,7 @@ const GetUsers = () => {
                           className={`cursor-pointer flex items-center ${user.active ? 'text-green-600' : 'text-red-600'}`}
                           onClick={() => openConfirmModal(user)}
                         >
-                          {user.active ? <FiCheckCircle className="mr-1" /> : <FiXCircle className="mr-1" />} 
+                          {user.active ? <FiCheckCircle className="mr-1" /> : <FiXCircle className="mr-1" />}
                           {user.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
@@ -384,8 +388,8 @@ const GetUsers = () => {
             {/* Pagination controls */}
             <div className="mt-4 flex justify-between items-center">
               <div>
-                <button 
-                  onClick={goToPreviousPage} 
+                <button
+                  onClick={goToPreviousPage}
                   disabled={currentPage === 1}
                   className={`px-3 py-1 rounded flex items-center ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
@@ -398,8 +402,8 @@ const GetUsers = () => {
               </div>
 
               <div>
-                <button 
-                  onClick={goToNextPage} 
+                <button
+                  onClick={goToNextPage}
                   disabled={currentPage === totalPages}
                   className={`px-3 py-1 rounded flex items-center ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
@@ -445,8 +449,23 @@ const GetUsers = () => {
               <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                 <Dialog.Title className="text-xl font-semibold">Edit Password</Dialog.Title>
 
-                <div className="mt-4 space-y-4">
-                  <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password (optional)" className="w-full border p-2 rounded" />
+                <div className="mt-4 space-y-4 relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password (optional)"
+                    className="w-full border p-2 rounded pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    style ={{paddingBottom: '1.8rem'}}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-4">
@@ -457,7 +476,6 @@ const GetUsers = () => {
             </div>
           </Dialog>
         </Transition>
-
         {/* Confirm Modal for Status Change */}
         <Transition appear show={isConfirmModalOpen} as={React.Fragment}>
           <Dialog onClose={closeConfirmModal} className="fixed inset-0 z-10 overflow-y-auto">

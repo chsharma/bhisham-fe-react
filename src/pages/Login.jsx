@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import { FiUser, FiLock } from 'react-icons/fi';
+import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -49,15 +50,13 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary">BHISHM App</h1>
+            <h1 className="text-3xl font-bold text-primary">BHISHM <span style={{ color: "black" }}>CUBE ONLINE</span></h1>
             <p className="text-gray-500 mt-2">Login to your account</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="label">
-                Username
-              </label>
+              <label htmlFor="username" className="label">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiUser className="text-gray-400" />
@@ -74,21 +73,25 @@ const Login = () => {
             </div>
             
             <div>
-              <label htmlFor="password" className="label">
-                Password
-              </label>
+              <label htmlFor="password" className="label">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiLock className="text-gray-400" />
                 </div>
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input pl-10"
+                  className="input pl-10 pr-10"
                   placeholder="Enter your password"
                 />
+                <div 
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FiEyeOff className="text-gray-400" /> : <FiEye className="text-gray-400" />}
+                </div>
               </div>
             </div>
             
@@ -110,6 +113,13 @@ const Login = () => {
           <div className="mt-6 text-center text-sm text-gray-500">
             <p>For demo purposes, you can use any username and password</p>
           </div>
+
+          <img 
+            src="image.jpeg"
+            alt="Bhishm App Logo" 
+            className="h-auto w-auto"
+            style={{ margin: 'auto', height: '5rem', marginTop: '1rem' }}
+          />
         </div>
       </div>
     </div>

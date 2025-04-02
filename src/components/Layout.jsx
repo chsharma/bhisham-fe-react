@@ -66,12 +66,12 @@ const Layout = () => {
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
 
-          {/* <h2 className="text-3xl font-extrabold text-white tracking-wide">Bhishm App</h2> */}
-          <img 
+          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHM Cube</h2>
+          {/* <img 
             src="image.jpeg"// Replace "logo.png" with your actual image file name
             alt="Bhishm App Logo" 
             className="h-auto w-auto" // Adjust height/width as needed
-          />
+          /> */}
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
@@ -203,6 +203,13 @@ const Layout = () => {
             {location.pathname === '/create-bhisham' && 'Create Bhishm'}
           </h1>
 
+          <img 
+            src="image.jpeg"// Replace "logo.png" with your actual image file name
+            alt="Bhishm App Logo" 
+            className="h-auto w-auto" // Adjust height/width as needed
+            style ={{height  : "4rem"}}
+          />
+
           {/* User Profile Section */}
           <div className="relative">
             <button onClick={toggleProfileDropdown} className="flex items-center gap-4">
@@ -212,6 +219,8 @@ const Layout = () => {
               <span className="text-lg font-medium text-gray-700">{user.name}</span>
               <FiChevronDown className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
+
+            
 
             {profileDropdownOpen && (
               <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-xl">
