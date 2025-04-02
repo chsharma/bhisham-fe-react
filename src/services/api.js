@@ -95,6 +95,16 @@ export const updateUser = async (userData) => {
   }
 };
 
+export const updateUsePassword = async (userData) => {
+  try {
+    const response = await api.post(`user/update-password`, JSON.stringify(userData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+};
+
 export const activeDeactiveUser = async (userData) => {
   try {
     const response = await api.post(`user/active-deactive`, JSON.stringify(userData));
@@ -166,7 +176,7 @@ export const createBhisham = async (bhishamData) => {
 export const completeBhisham = async (bhishamId) => {
 
   try {
-    const response = await api.post(`/dashboard/create-data`, { "bhisham_id": bhishamId })
+    const response = await api.post(`/bhisham/create-data`, { "bhisham_id": bhishamId })
     console.log('cubes response', response.data)
     return response?.data
   } catch (err) {

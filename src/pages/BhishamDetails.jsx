@@ -319,7 +319,9 @@ const BhishamDetails = () => {
     setIsDeleteModalOpen(false);
     setSelectedItem("");
     setDropdownOpen("");
-    fetchBhishamDetails()
+    // fetchBhishamDetails()
+    handleKitSelect(selectedKit,  kits[selectedKit].kit_slug)
+
 
 
   }
@@ -328,7 +330,11 @@ const BhishamDetails = () => {
     setIsModalOpen(false);
     setSelectedItem("");
     setDropdownOpen("");
-    fetchBhishamDetails()
+    console.log(kits[selectedKit])
+
+    // fetchBhishamDetails()
+    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
+
 
 
   }
@@ -337,13 +343,19 @@ const BhishamDetails = () => {
     setMarkAsUpdateModalOpen(false);
     setSelectedItem("");
     setDropdownOpen("");
-    fetchBhishamDetails()
+    // fetchBhishamDetails()
+    console.log(kits, selectedKit,kits[selectedKit])
+
+    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
+
   }
 
   const handleAddModalClose = () => {
     setIsAddModalOpen(false);
     setDropdownOpen("");
-    fetchBhishamDetails()
+    // fetchBhishamDetails()
+    console.log(kits, selectedKit,kits[selectedKit])
+    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
   }
 
 
@@ -395,13 +407,13 @@ const BhishamDetails = () => {
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500">HH Synch Count</span>
+            <span className="text-gray-500">HH Sync Count</span>
             <span className="truncate font-bold text-xl">{bhisham.hh_synch_count || '—'}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">HH_SYNCH_COUNT</p>
+          {/* <div>
+            <p className="text-sm text-gray-500">HH SYNC COUNT</p>
             <p className="font-medium">{bhisham.hh_synch_count || 'Empty'}</p>
-          </div>
+          </div> */}
 
           <div className="flex flex-col">
             <span className="text-gray-500">Bhishm Close</span>
@@ -422,7 +434,7 @@ const BhishamDetails = () => {
 
       {/* Mother boxes selection */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h3 className="text-lg font-medium text-gray-700 mb-4">Select Mother Box</h3>
+        <h3 className="text-lg font-medium text-gray-700 mb-4">Select Mother Cube</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={() => handleMotherBoxSelect(1)}
@@ -435,7 +447,7 @@ const BhishamDetails = () => {
               <FiBox className="h-6 w-6" />
             </div>
             <div className="ml-4">
-              <h4 className="font-medium">Mother Box 1</h4>
+              <h4 className="font-medium">Mother Cube 1</h4>
               <p className="text-sm text-gray-500">Primary container</p>
             </div>
           </button>
@@ -451,7 +463,7 @@ const BhishamDetails = () => {
               <FiBox className="h-6 w-6" />
             </div>
             <div className="ml-4">
-              <h4 className="font-medium">Mother Box 2</h4>
+              <h4 className="font-medium">Mother Cube 2</h4>
               <p className="text-sm text-gray-500">Secondary container</p>
             </div>
           </button>
@@ -510,7 +522,7 @@ const BhishamDetails = () => {
                 })}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No cubes available for this Mother Box</p>
+              <p className="text-gray-500 text-center py-4">No cubes available for this Mother Cube</p>
             )}
           </div>
 
@@ -620,8 +632,8 @@ const BhishamDetails = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 truncate">{item.sku_name}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm font-medium text-black-900 truncate">{item.sku_name}</p>
+                            <p className="text-xs text-black-500">
                               <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
                             </p>
                           </div>

@@ -4,7 +4,7 @@ import { FiUser, FiCheckCircle, FiXCircle, FiClock, FiEdit, FiChevronLeft, FiChe
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { activeDeactiveUser, getAllUser, getRoleList, getUserList, updateUser } from '../services/api';
+import { activeDeactiveUser, getAllUser, getRoleList, getUserList, updateUsePassword, updateUser } from '../services/api';
 import { BsFillPassFill } from 'react-icons/bs';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 
@@ -183,6 +183,26 @@ const GetUsers = () => {
       toast.error('Failed to update user.');
     }
   };
+
+  const handlePasswordUpdate = async () => {
+    try {
+
+      selectedUser.password = formData.password
+      selectedUser.login_id = formData.login_id
+
+      const response = await updateUsePassword(selectedUser);
+
+      // await axios.post(`https://api.gryfontech.com/v1/api/user/update-user`, formData);
+      toast.success('User Password updated successfully!');
+      setSelectedUser({});
+      closeModal();
+      fetchUserList();
+
+    } catch (error) {
+      toast.error('Failed to update user.');
+    }
+  };
+  
 
   const handleStatusUpdate = async () => {
     try {
@@ -431,7 +451,7 @@ const GetUsers = () => {
 
                 <div className="mt-6 flex justify-end space-x-4">
                   <button onClick={closePasswordModal} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-                  <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+                  <button onClick={handlePasswordUpdate} className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
                 </div>
               </Dialog.Panel>
             </div>
