@@ -14,7 +14,7 @@ const CreateUser = () => {
     name: Yup.string().required('Name is required'),
     login_id: Yup.string().required('Login ID is required'),
     password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
+      .min(5, 'Password must be at least 5 characters')
       .required('Password is required'),
     role_id: Yup.string().required('Role is required'),
   });
