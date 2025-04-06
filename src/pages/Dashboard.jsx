@@ -87,6 +87,7 @@ const Dashboard = () => {
             icon="kit.jpeg"
             color="bg-purple-500"
           />
+          
         </div>
 
         {/* Quick Actions Section */}

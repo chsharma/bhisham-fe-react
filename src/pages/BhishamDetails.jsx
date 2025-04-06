@@ -417,8 +417,11 @@ const BhishamDetails = () => {
 
           <div className="flex flex-col">
             <span className="text-gray-500">Bhishm Close</span>
-            <span className="truncate font-bold text-xl">{bhisham.is_bhisham_close || '—'}</span>
+            <span className="truncate font-bold text-xl">
+              {bhisham.is_bhisham_close === 1 ? 'Closed' : 'WIP'}
+            </span>
           </div>
+          
 
           <div className="flex flex-col">
             <span className="text-gray-500">Close By</span>
@@ -631,12 +634,38 @@ const BhishamDetails = () => {
                         style={{ padding: '1rem' }}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="min-w-0 flex-1">
+                          {/* <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-black-900 truncate">{item.sku_name}</p>
                             <p className="text-xs text-black-500">
                               <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
                             </p>
+                          </div> */}
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <p className="text-sm font-semibold text-gray-900 truncate"><span className="font-medium">KIT No.</span> {item.kit_no}<span> - </span> {item.sku_name}</p>
+
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Batch/Ser No:</span> {item.batch_no_sr_no}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Manufacturer:</span> {item.manufactured_by || 'N/A'}
+                            </p>
+
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Qty:</span> {item.sku_qty || 'N/A'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">MFD:</span> {item.mfd || 'N/A'}
+                            </p>
+                            {/* Expiry Date */}
+                            <p
+                              className={`text-xs font-medium ${
+                                item.exp && item.exp !== 'NA' && new Date(item.exp) < new Date() ? 'text-red-600' : 'text-gray-600'
+                              }`}
+                            >
+                              <span className="font-medium">Exp:</span> {item.exp || 'N/A'}
+                            </p>
                           </div>
+
                           {icon}
 
                           {bhisham && !bhisham.is_bhisham_close && <div className="relative">
