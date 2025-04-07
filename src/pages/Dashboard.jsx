@@ -110,24 +110,24 @@ const Dashboard = () => {
           />
           
           <DashboardCard
-            title="Near By Expiry 1 Month"
+            title="Nearby Expiry 1 Month"
             count={ExpiryCounts.expiring_in_1_month}
             icon="kit.jpeg"
-            color="bg-purple-500"
+            color="bg-lime-500"
           />
 
           <DashboardCard
-            title="Near By Expiry 15 Days"
+            title="Nearby Expiry 15 Days"
             count={ExpiryCounts.expiring_in_15_days}
             icon="kit.jpeg"
-            color="bg-purple-500"
+            color="bg-yellow-500"
           />
 
           <DashboardCard
             title="Expired Kits"
             count={ExpiryCounts.already_expired}
             icon="kit.jpeg"
-            color="bg-purple-500"
+            color="bg-red-500"
           />
         </div>
 

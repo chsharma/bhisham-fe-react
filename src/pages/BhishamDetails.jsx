@@ -455,7 +455,7 @@ const BhishamDetails = () => {
           </div> */}
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Delivered Status</span>
+            <span className="text-gray-500">Delivery Status</span>
             <span className="truncate font-bold text-xl">
               {bhisham.is_bhisham_close === 1 ? 'Delivered' : 'WIP'}
             </span>
@@ -463,12 +463,12 @@ const BhishamDetails = () => {
           
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Delivered By</span>
+            <span className="text-gray-500">Delivery By</span>
             <span className="truncate font-bold text-xl">{bhisham.close_by || '—'}</span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Delivered Time</span>
+            <span className="text-gray-500">Delivery Time</span>
             <span className="truncate font-bold text-xl">{bhisham.close_time || '—'}</span>
           </div>
         </div>
@@ -477,24 +477,24 @@ const BhishamDetails = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mb-4">
            
           <ExpiryCard
-            title="Near By Expiry 1 Month"
+            title="Nearby Expiry 1 Month"
             count={ExpiryCounts.expiring_in_1_month}
             icon="../kit.jpeg"
-            color="bg-purple-500"
+            color="bg-lime-500"
           />
 
           <ExpiryCard
-            title="Near By Expiry 15 Days"
+            title="Nearby Expiry 15 Days"
             count={ExpiryCounts.expiring_in_15_days}
             icon="../kit.jpeg"
-            color="bg-purple-500"
+            color="bg-yellow-500"
           />
 
           <ExpiryCard
             title="Expired Kits"
             count={ExpiryCounts.already_expired}
             icon="../kit.jpeg"
-            color="bg-purple-500"
+            color="bg-red-500"
           />
         </div>
       
