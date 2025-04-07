@@ -1,25 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { createUser } from '../services/api';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
+import { createUser, getRoleList } from '../services/api';
 import { FiUser, FiLock, FiMail, FiShield, FiEye, FiEyeOff } from 'react-icons/fi';
 
 const CreateUser = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [roleList, setRoleList] = useState([]);
 
-  // Form validation schema
+  useEffect(() => {
+    fetchRoleList();
+  }, []);
+
+  const fetchRoleList = async () => {
+    setLoading(true);
+    try {
+      const response = await getRoleList(user);
+      console.log('response from role list', response);
+
+      if (response && response.data && Array.isArray(response.data)) {
+        setRoleList(response.data);
+      } else if (Array.isArray(response)) {
+        setRoleList(response);
+      } else {
+        console.error('Unexpected API response format:', response);
+        setRoleList([]);
+        toast.error('Received invalid data format from server');
+      }
+    } catch (error) {
+      toast.error('Failed to fetch roles');
+      console.error('Error fetching roles:', error);
+      setRoleList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
     login_id: Yup.string().required('Login ID is required'),
-    password: Yup.string()
-      .min(5, 'Password must be at least 5 characters')
-      .required('Password is required'),
+    password: Yup.string().min(5, 'Password must be at least 5 characters').required('Password is required'),
     role_id: Yup.string().required('Role is required'),
   });
 
-  // Form handling with Formik
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -31,7 +58,7 @@ const CreateUser = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        values.role_id = values.role_id ? parseInt( values.role_id, 10) : 0;
+        values.role_id = values.role_id ? parseInt(values.role_id, 10) : 0;
 
         await createUser(values);
         toast.success('User created successfully');
@@ -142,9 +169,11 @@ const CreateUser = () => {
                 {...formik.getFieldProps('role_id')}
               >
                 <option value="">Select a role</option>
-                <option value="1">Admin</option>
-                <option value="2">Manager</option>
-                <option value="3">User</option>
+                {roleList.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
               </select>
             </div>
             {formik.touched.role_id && formik.errors.role_id ? (

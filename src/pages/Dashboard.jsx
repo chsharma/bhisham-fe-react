@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getDashboardCounts } from '../services/api';
+import { getDashboardCounts, getExpiryCounts } from '../services/api';
 import { FiPackage, FiBox, FiLayers, FiGrid } from 'react-icons/fi';
 
 const DashboardCard = ({ title, count, icon, color }) => (
@@ -28,6 +28,13 @@ const Dashboard = () => {
     kits: 0,
     mc: 0
   });
+
+  const [ExpiryCounts, setExpiryCounts] = useState({
+    already_expired: 0,
+    expiring_in_15_days: 0,
+    expiring_in_1_month: 0
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +51,21 @@ const Dashboard = () => {
       }
     };
 
+    const fetchExpiredCount = async () => {
+      try {
+        console.log('api call');
+        const response = await getExpiryCounts(0);
+        console.log('data', response);
+        setExpiryCounts(response);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
+    fetchExpiredCount();
   }, []);
 
   if (loading) {
@@ -88,6 +109,26 @@ const Dashboard = () => {
             color="bg-purple-500"
           />
           
+          <DashboardCard
+            title="Near By Expiry 1 Month"
+            count={ExpiryCounts.expiring_in_1_month}
+            icon="kit.jpeg"
+            color="bg-purple-500"
+          />
+
+          <DashboardCard
+            title="Near By Expiry 15 Days"
+            count={ExpiryCounts.expiring_in_15_days}
+            icon="kit.jpeg"
+            color="bg-purple-500"
+          />
+
+          <DashboardCard
+            title="Expired Kits"
+            count={ExpiryCounts.already_expired}
+            icon="kit.jpeg"
+            color="bg-purple-500"
+          />
         </div>
 
         {/* Quick Actions Section */}
