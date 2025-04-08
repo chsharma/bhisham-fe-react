@@ -158,52 +158,51 @@ const ViewBhisham = () => {
   };
 
   // Helper function to convert data to CSV and trigger download
-  const downloadCSV = (data, filename) => {
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      toast.error('No data to download');
-      return;
-    }
+const downloadCSV = (data, filename) => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    toast.error('No data to download');
+    return;
+  }
 
-    // Get headers from the first object
-    const headers = Object.keys(data[0]);
+  // Get headers from the first object
+  const headers = Object.keys(data[0]);
 
-    // Create CSV rows
-    const csvRows = [];
+  // Create CSV rows
+  const csvRows = [];
 
-    // Add header row
-    csvRows.push(headers.join(','));
+  // Add header row
+  csvRows.push(headers.join(','));
 
-    // Add data rows
-    for (const row of data) {
-      const values = headers.map(header => {
-        const value = row[header];
-        // Handle undefined, null or special characters
-        if (value === null || value === undefined) {
-          return '';
-        }
-        const escaped = String(value).replace(/"/g, '""');
-        // Wrap values with commas or quotes in double quotes
-        return /[,"\n\r]/.test(escaped) ? "${escaped}" : escaped;
-      });
-      csvRows.push(values.join(','));
-    }
+  // Add data rows
+  for (const row of data) {
+    const values = headers.map(header => {
+      const value = row[header];
+      if (value === null || value === undefined) return '';
 
-    // Create a CSV string
-    const csvString = csvRows.join('\n');
+      const strValue = String(value);
+      // Wrap in double quotes if value contains special characters
+      return /[,"\n\r]/.test(strValue) ? `"${strValue}"` : strValue;
+    });
+    csvRows.push(values.join(','));
+  }
 
-    // Create blob and download link
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${filename}.csv`);
-    link.style.visibility = 'hidden';
+  // Create a CSV string
+  const csvString = csvRows.join('\n');
 
-    // Append to the body, trigger download, and clean up
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // Create blob and download link
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.csv`);
+  link.style.visibility = 'hidden';
+
+  // Append to the body, trigger download, and clean up
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
   // Helper function to format date for filename
   const formatDate = (date) => {
