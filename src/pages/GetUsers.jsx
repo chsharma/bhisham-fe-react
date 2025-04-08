@@ -77,8 +77,8 @@ const GetUsers = () => {
         toast.error('Received invalid data format from server');
       }
     } catch (error) {
-      toast.error('Failed to fetch Bhishm data');
-      console.error('Error fetching Bhishm:', error);
+      toast.error('Failed to fetch roles');
+      console.error('Error fetching roles:', error);
       setRoleList([]);
     } finally {
       setLoading(false);

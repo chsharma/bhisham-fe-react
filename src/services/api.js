@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,9 +11,10 @@ const api = axios.create({
 // Add a request interceptor to include auth token
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  console.log('inside user', user)
+  console.log('inside user', user);
+  
   if (user.token) {
-    config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTA0MjI2MjUsInVzZXJfaWQiOiJjaHNoYXJtYSJ9.6WxzQykxIN5H5v8HaclcWpaXh8DHFD1XUMaatQLf8Io`;
+    config.headers.Authorization = `Bearer ${user.token}`;
   }
   return config;
 });
@@ -25,6 +26,58 @@ export const getDashboardCounts = async () => {
   try {
     console.log('Inside api post create User request')
     const response = await api.get('/dashboard/get-stats');
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+export const getExpiryCounts = async (bhishamId) => {
+  console.log('inside this')
+  try {
+    console.log('Inside api post create User request')
+    const response = await api.get(`/dashboard/get-expiry-count?bhishamid=${bhishamId}`);
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+export const getExpiredKits = async (bhishamId) => {
+  console.log('inside this')
+  try {
+    console.log('Inside api post create User request')
+    const response = await api.get(`/dashboard/get-expired-kits?bhishamid=${bhishamId}`);
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+export const getKitsExpiringIn15Days = async (bhishamId) => {
+  console.log('inside this')
+  try {
+    console.log('Inside api post create User request')
+    const response = await api.get(`/dashboard/get-expiry-fifteen-days?bhishamid=${bhishamId}`);
+    console.log('user-response', response?.data?.data)
+    return response?.data?.data
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
+
+export const getKitsExpiringIn1Month = async (bhishamId) => {
+  console.log('inside this')
+  try {
+    console.log('Inside api post create User request')
+    const response = await api.get(`/dashboard/get-expiry-one-month?bhishamid=${bhishamId}`);
     console.log('user-response', response?.data?.data)
     return response?.data?.data
   } catch (err) {

@@ -7,7 +7,8 @@ import {
   getKitsByCube,
   getItemsByKit,
   getItemDetails,
-  updateItem
+  updateItem,
+  getExpiryCounts
 } from '../services/api';
 import { FiArrowLeft, FiBox, FiPackage, FiGrid, FiInfo, FiCheckCircle, FiAlertCircle, FiCircle, FiXCircle, FiPlusCircle } from 'react-icons/fi';
 import ItemDetailModal from '../components/ItemDetailModal';
@@ -16,6 +17,25 @@ import MarkAsUpdateItemDialog from '../components/MarkAsUpdateItemDialog';
 import DeleteItemDialog from '../components/DeleteItemDialog';
 
 import { FiMoreHorizontal } from 'react-icons/fi';
+
+const ExpiryCard = ({ title, count, icon, color }) => (
+  <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-100">
+    <div className="flex items-center space-x-6">
+      <div className={`p-3 rounded-lg ${color || 'bg-blue-50'} flex items-center justify-center w-20 h-20`}>
+        <img 
+          src={icon}
+          alt={title}
+          className="object-contain max-w-full max-h-full"
+        />
+      </div>
+      <div>
+        <h3 className="text-lg font-medium text-gray-600 mb-1">{title}</h3>
+        <p className="text-4xl font-bold text-gray-900">{count.toLocaleString()}</p>
+      </div>
+    </div>
+  </div>
+);
+
 const BhishamDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,6 +71,12 @@ const BhishamDetails = () => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
+  const [ExpiryCounts, setExpiryCounts] = useState({
+    already_expired: 0,
+    expiring_in_15_days: 0,
+    expiring_in_1_month: 0
+  });
+
   const toggleDropdown = (id) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
@@ -73,6 +99,20 @@ const BhishamDetails = () => {
   }, [searchTermItems, items]);
 
   // Fetch bhisham details
+
+  const fetchExpiredCount = async () => {
+    try {
+      console.log('api call');
+      const response = await getExpiryCounts(id);
+      console.log('data', response);
+      setExpiryCounts(response);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const fetchBhishamDetails = async () => {
     setLoading(true);
@@ -101,10 +141,10 @@ const BhishamDetails = () => {
     }
   };
 
-
   useEffect(() => {
 
     fetchBhishamDetails();
+    fetchExpiredCount();
   }, [id, navigate]);
 
   // Function to handle mother box selection
@@ -114,7 +154,6 @@ const BhishamDetails = () => {
     setSelectedKit(null);
     setKits([]);
     setItems([]);
-
     // Fetch cubes for the selected mother box
     setLoadingCubes(true);
     try {
@@ -416,22 +455,49 @@ const BhishamDetails = () => {
           </div> */}
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Bhishm Close</span>
-            <span className="truncate font-bold text-xl">{bhisham.is_bhisham_close || '—'}</span>
+            <span className="text-gray-500">Delivery Status</span>
+            <span className="truncate font-bold text-xl">
+              {bhisham.is_bhisham_close === 1 ? 'Delivered' : 'WIP'}
+            </span>
           </div>
+          
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Close By</span>
+            <span className="text-gray-500">Delivery By</span>
             <span className="truncate font-bold text-xl">{bhisham.close_by || '—'}</span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500">Close Time</span>
+            <span className="text-gray-500">Delivery Time</span>
             <span className="truncate font-bold text-xl">{bhisham.close_time || '—'}</span>
           </div>
         </div>
       </div>
+      {/* Expiry count card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mb-4">
+           
+          <ExpiryCard
+            title="Nearby Expiry 1 Month"
+            count={ExpiryCounts.expiring_in_1_month}
+            icon="../kit.jpeg"
+            color="bg-lime-500"
+          />
 
+          <ExpiryCard
+            title="Nearby Expiry 15 Days"
+            count={ExpiryCounts.expiring_in_15_days}
+            icon="../kit.jpeg"
+            color="bg-yellow-500"
+          />
+
+          <ExpiryCard
+            title="Expired Kits"
+            count={ExpiryCounts.already_expired}
+            icon="../kit.jpeg"
+            color="bg-red-500"
+          />
+        </div>
+      
       {/* Mother boxes selection */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h3 className="text-lg font-medium text-gray-700 mb-4">Select Mother Cube</h3>
@@ -631,12 +697,38 @@ const BhishamDetails = () => {
                         style={{ padding: '1rem' }}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="min-w-0 flex-1">
+                          {/* <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-black-900 truncate">{item.sku_name}</p>
                             <p className="text-xs text-black-500">
                               <b>Batch No: </b>{item.batch_no_sr_no} • <b>Exp:</b> {item.exp || 'N/A'}
                             </p>
+                          </div> */}
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <p className="text-sm font-semibold text-gray-900 truncate"><span className="font-medium">KIT No.</span> {item.kit_no}<span> - </span> {item.sku_name}</p>
+
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Batch/Ser No:</span> {item.batch_no_sr_no}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Manufacturer:</span> {item.manufactured_by || 'N/A'}
+                            </p>
+
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Qty:</span> {item.sku_qty || 'N/A'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">MFD:</span> {item.mfd || 'N/A'}
+                            </p>
+                            {/* Expiry Date */}
+                            <p
+                              className={`text-xs font-medium ${
+                                item.exp && item.exp !== 'NA' && new Date(item.exp) < new Date() ? 'text-red-600' : 'text-gray-600'
+                              }`}
+                            >
+                              <span className="font-medium">Exp:</span> {item.exp || 'N/A'}
+                            </p>
                           </div>
+
                           {icon}
 
                           {bhisham && !bhisham.is_bhisham_close && <div className="relative">

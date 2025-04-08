@@ -109,11 +109,7 @@ const Login = () => {
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
-          
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>For demo purposes, you can use any username and password</p>
-          </div>
-
+        
           <img 
             src="image.jpeg"
             alt="Bhishm App Logo" 

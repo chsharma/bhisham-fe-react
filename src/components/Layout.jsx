@@ -66,7 +66,7 @@ const Layout = () => {
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
 
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHM Cube</h2>
+          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHM CUBE</h2>
           {/* <img 
             src="image.jpeg"// Replace "logo.png" with your actual image file name
             alt="Bhishm App Logo" 
