@@ -408,6 +408,16 @@ export const getUpdateDataType = async () => {
   }
 }
 
+export const getBhishmType = async () => {
+  try {
+
+    const response = await api.get(`dashboard/bhishm-type`);
+    console.log(response)
+    return response?.data?.data
+  } catch (err) {
+    console.log('error', err)
+  }
+}
 
 export const createItem = async (itemData, complete) => {
 
