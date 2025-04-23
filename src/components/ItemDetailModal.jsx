@@ -8,13 +8,14 @@ import {
 } from '../services/api';
 
 const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
-  console.log(item)
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     batch_no_sr_no: item?.batch_no_sr_no || '',
     mfd: item?.mfd || '',
     exp: item?.exp || '',
     update_typeid: '',
+    manufactured_by: item?.manufactured_by || '',
+    sku_qty: item?.sku_qty || '',
   });
 
   const [updateOptions, setupdateOptions] = useState([]);
@@ -26,16 +27,16 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
         mfd: item?.mfd || '',
         exp: item?.exp || '',
         update_typeid: '',
+        manufactured_by: item?.manufactured_by || '',
+        sku_qty: item?.sku_qty || '',
       });
     }
   }, [item]);
-
 
   useEffect(() => {
     const fetchBhishamDetails = async () => {
       try {
         const response = await getUpdateDataType();
-        console.log('inside the response array', response)
         setupdateOptions(response);
       } catch (error) {
         console.error('Error fetching Options details:', error);
@@ -46,33 +47,32 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value)
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(formData)
-
   const handleSubmit = async () => {
     try {
+      const data = {
+        bhisham_id: bhisham.id,
+        mc_no: item.mc_no,
+        cube_number: item.cube_number,
+        kit_code: item.kit_code,
+        kit_slug: item.kit_slug,
+        sku_code: item.sku_code,
+        sku_slug: item.sku_slug,
+        batch_code: formData.batch_no_sr_no,
+        mfd: formData.mfd,
+        exp: formData.exp,
+        id: item.id,
+        update_typeid: formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0,
+        manufactured_by: formData.manufactured_by,
+        sku_qty: parseInt(formData.sku_qty, 10) || 0,
+      };
 
-      let data = {};
-
-      data.bhisham_id = bhisham.id;
-      data.mc_no = item.mc_no;
-      data.cube_number = item.cube_number;
-      data.kit_code =item.kit_code;
-      data.kit_slug =item.kit_slug;
-      data.sku_code = item.sku_code;
-      data.sku_slug = item.sku_slug;
-      data.batch_code = formData.batch_no_sr_no;
-      data.mfd = formData.mfd;
-      data.exp = formData.exp;
-      data.id = item.id;
-      data.update_typeid = formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0;
-      await updateItems( data, completed);
+      await updateItems(data, completed);
       toast.success('Item updated successfully!');
       setFormData({});
-      setIsEditing(false)
+      setIsEditing(false);
       onClose();
     } catch (error) {
       toast.error('Failed to update item');
@@ -114,42 +114,95 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
                   </button>
                 </div>
 
-                {item ? <div className="space-y-4">
-                  <div>
-                    <label className="text-sm text-gray-500">Batch Serial No</label>
-                    <input type="text" name="batch_no_sr_no" value={formData.batch_no_sr_no} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
+                {item ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm text-gray-500">Batch Serial No</label>
+                      <input
+                        type="text"
+                        name="batch_no_sr_no"
+                        value={formData.batch_no_sr_no}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Mfg Date</label>
+                      <input
+                        type="date"
+                        name="mfd"
+                        value={formData.mfd}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Expiration Date</label>
+                      <input
+                        type="date"
+                        name="exp"
+                        value={formData.exp}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Manufactured By</label>
+                      <input
+                        type="text"
+                        name="manufactured_by"
+                        value={formData.manufactured_by}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">SKU Quantity</label>
+                      <input
+                        type="number"
+                        name="sku_qty"
+                        value={formData.sku_qty}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Update Action</label>
+                      <select
+                        name="update_typeid"
+                        value={formData.update_typeid}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border rounded p-2"
+                      >
+                        <option value="">Select an action</option>
+                        {updateOptions.map((option) => (
+                          <option key={option.update_typeid} value={option.update_typeid}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  
                   </div>
-                  <div>
-                    <label className="text-sm text-gray-500">Mfg Date</label>
-                    <input type="date" name="mfd" value={formData.mfd} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-500">Expiration Date</label>
-                    <input type="date" name="exp" value={formData.exp} onChange={handleChange} disabled={!isEditing} className="w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-500">Update Action</label>
-                    <select
-                      name="update_typeid"
-                      value={formData.update_typeid}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full border rounded p-2"
-                    >
-                      <option value="">Select an action</option>
-                      {updateOptions.map((option) => (
-                        <option key={option.update_typeid} value={option.update_typeid}>{option.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div> :
-                  <p>Loading item details...</p>}
+                ) : (
+                  <p>Loading item details...</p>
+                )}
 
                 <div className="flex justify-end space-x-4 mt-4">
                   {isEditing ? (
                     <>
-                      <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
-                      <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
+                      <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>
+                        Cancel
+                      </button>
+                      <button className="btn btn-primary" onClick={handleSubmit}>
+                        Submit
+                      </button>
                     </>
                   ) : (
                     <button className="btn btn-primary flex items-center" onClick={() => setIsEditing(true)}>
