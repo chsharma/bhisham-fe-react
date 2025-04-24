@@ -704,8 +704,10 @@ const BhishamDetails = () => {
                             </p>
                           </div> */}
                           <div className="min-w-0 flex-1 space-y-1">
-                            <p className="text-sm font-semibold text-gray-900 truncate"><span className="font-medium">KIT No.</span> {item.kit_no}<span> - </span> {item.sku_name}</p>
-
+                          <p className="text-sm font-semibold text-gray-900 whitespace-normal break-words">
+                            <span className="font-medium">KIT No.</span> {item.kit_no}
+                            <span> - </span> {item.sku_name}
+                          </p>
                             <p className="text-xs text-gray-600">
                               <span className="font-medium">Batch/Ser No:</span> {item.batch_no_sr_no}
                             </p>
