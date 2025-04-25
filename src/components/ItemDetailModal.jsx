@@ -11,8 +11,10 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     batch_no_sr_no: item?.batch_no_sr_no || '',
-    mfd: item?.mfd || '',
-    exp: item?.exp || '',
+    mfd_month: '',
+    mfd_year: '',
+    exp_month: '',
+    exp_year: '',
     update_typeid: '',
     manufactured_by: item?.manufactured_by || '',
     sku_qty: item?.sku_qty || '',
@@ -20,12 +22,44 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
 
   const [updateOptions, setupdateOptions] = useState([]);
 
+  // Generate months and years for dropdowns with NA option
+  const months = [
+    { value: '', label: 'NA' },
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = [
+    { value: '', label: 'NA' },
+    ...Array.from({ length: 20 }, (_, i) => ({ 
+      value: (currentYear - 10 + i).toString(), 
+      label: (currentYear - 10 + i).toString() 
+    }))
+  ];
+
   useEffect(() => {
     if (item) {
+      // Parse existing dates if they exist
+      const mfdDate = item?.mfd ? new Date(item.mfd) : null;
+      const expDate = item?.exp ? new Date(item.exp) : null;
+      
       setFormData({
         batch_no_sr_no: item?.batch_no_sr_no || '',
-        mfd: item?.mfd || '',
-        exp: item?.exp || '',
+        mfd_month: mfdDate ? (mfdDate.getMonth() + 1).toString().padStart(2, '0') : '',
+        mfd_year: mfdDate ? mfdDate.getFullYear().toString() : '',
+        exp_month: expDate ? (expDate.getMonth() + 1).toString().padStart(2, '0') : '',
+        exp_year: expDate ? expDate.getFullYear().toString() : '',
         update_typeid: '',
         manufactured_by: item?.manufactured_by || '',
         sku_qty: item?.sku_qty || '',
@@ -50,8 +84,25 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Function to get last day of month
+  const getLastDayOfMonth = (year, month) => {
+    return new Date(year, month, 0).getDate();
+  };
+
   const handleSubmit = async () => {
     try {
+      // Convert month/year to full date (last day of month for expiration)
+      let mfd = '';
+      if (formData.mfd_month && formData.mfd_year) {
+        mfd = `${formData.mfd_year}-${formData.mfd_month}-01`;
+      }
+      
+      let exp = '';
+      if (formData.exp_month && formData.exp_year) {
+        const lastDay = getLastDayOfMonth(parseInt(formData.exp_year), parseInt(formData.exp_month));
+        exp = `${formData.exp_year}-${formData.exp_month}-${lastDay}`;
+      }
+
       const data = {
         bhisham_id: bhisham.id,
         mc_no: item.mc_no,
@@ -61,8 +112,8 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
         sku_code: item.sku_code,
         sku_slug: item.sku_slug,
         batch_code: formData.batch_no_sr_no,
-        mfd: formData.mfd,
-        exp: formData.exp,
+        mfd: mfd || null, // Send null if empty
+        exp: exp || null, // Send null if empty
         id: item.id,
         update_typeid: formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0,
         manufactured_by: formData.manufactured_by,
@@ -127,28 +178,69 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
                         className="w-full border rounded p-2"
                       />
                     </div>
-                    <div>
-                      <label className="text-sm text-gray-500">Mfg Date</label>
-                      <input
-                        type="date"
-                        name="mfd"
-                        value={formData.mfd}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="w-full border rounded p-2"
-                      />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm text-gray-500">Mfg Month</label>
+                        <select
+                          name="mfd_month"
+                          value={formData.mfd_month}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          className="w-full border rounded p-2"
+                        >
+                          {months.map(month => (
+                            <option key={month.value} value={month.value}>{month.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-500">Mfg Year</label>
+                        <select
+                          name="mfd_year"
+                          value={formData.mfd_year}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          className="w-full border rounded p-2"
+                        >
+                          {years.map(year => (
+                            <option key={year.value} value={year.value}>{year.label}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm text-gray-500">Expiration Date</label>
-                      <input
-                        type="date"
-                        name="exp"
-                        value={formData.exp}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="w-full border rounded p-2"
-                      />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm text-gray-500">Exp Month</label>
+                        <select
+                          name="exp_month"
+                          value={formData.exp_month}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          className="w-full border rounded p-2"
+                        >
+                          {months.map(month => (
+                            <option key={month.value} value={month.value}>{month.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-500">Exp Year</label>
+                        <select
+                          name="exp_year"
+                          value={formData.exp_year}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          className="w-full border rounded p-2"
+                        >
+                          {years.map(year => (
+                            <option key={year.value} value={year.value}>{year.label}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
+                    
                     <div>
                       <label className="text-sm text-gray-500">Manufactured By</label>
                       <input
@@ -188,7 +280,6 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
                         ))}
                       </select>
                     </div>
-                  
                   </div>
                 ) : (
                   <p>Loading item details...</p>
