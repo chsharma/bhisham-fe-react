@@ -26,6 +26,7 @@ import CreateUser from './pages/CreateUser';
 import ViewBhisham from './pages/ViewBhisham';
 import CreateBhisham from './pages/CreateBhisham';
 import BhishamDetails from './pages/BhishamDetails';
+import ViewExpiry from './pages/ViewExpiry';
 
 // Layout
 import Layout from './components/Layout';
@@ -51,6 +52,7 @@ function App() {
             <Route path="get-user" element={<GetUsers />} />
             <Route path="update-password" element={<UpdatePassword />} />
             <Route path="view-bhisham" element={<ViewBhisham />} />
+            <Route path="view-kits-expiry-and-shorts" element={<ViewExpiry/>} />
             <Route path="create-bhisham" element={<CreateBhisham />} />
             <Route path="bhisham/:id" element={<BhishamDetails />} />
           </Route>

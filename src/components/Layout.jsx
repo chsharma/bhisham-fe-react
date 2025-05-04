@@ -162,6 +162,12 @@ const Layout = () => {
                 >
                   Create Bhishm
                 </NavLink>
+                <NavLink
+                  to="/view-kits-expiry-and-shorts"
+                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
+                >
+                  View Kits Expiry & Shorts
+                </NavLink>
               </div>
             )}
           </div>
