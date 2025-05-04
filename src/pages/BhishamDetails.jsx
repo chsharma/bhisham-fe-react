@@ -8,7 +8,9 @@ import {
   getItemsByKit,
   getItemDetails,
   updateItem,
-  getExpiryCounts
+  getExpiryCounts,
+  getPendingItems,
+  getExpiringData
 } from '../services/api';
 import { FiArrowLeft, FiBox, FiPackage, FiGrid, FiInfo, FiCheckCircle, FiAlertCircle, FiCircle, FiXCircle, FiPlusCircle } from 'react-icons/fi';
 import ItemDetailModal from '../components/ItemDetailModal';
@@ -18,15 +20,14 @@ import DeleteItemDialog from '../components/DeleteItemDialog';
 
 import { FiMoreHorizontal } from 'react-icons/fi';
 
-const ExpiryCard = ({ title, count, icon, color }) => (
-  <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-100">
+const ExpiryCard = ({ title, count, icon, color, onClick }) => (
+  <div
+    onClick={onClick}
+    className="cursor-pointer bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-100"
+  >
     <div className="flex items-center space-x-6">
       <div className={`p-3 rounded-lg ${color || 'bg-blue-50'} flex items-center justify-center w-20 h-20`}>
-        <img 
-          src={icon}
-          alt={title}
-          className="object-contain max-w-full max-h-full"
-        />
+        <img src={icon} alt={title} className="object-contain max-w-full max-h-full" />
       </div>
       <div>
         <h3 className="text-lg font-medium text-gray-600 mb-1">{title}</h3>
@@ -36,6 +37,7 @@ const ExpiryCard = ({ title, count, icon, color }) => (
   </div>
 );
 
+
 const BhishamDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,6 +45,8 @@ const BhishamDetails = () => {
   const [bhisham, setBhisham] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeMotherBox, setActiveMotherBox] = useState(null);
+  const [activePendingItems, setActivePendingItems] = useState(null);
+  
 
   const [selectedCube, setSelectedCube] = useState(null);
   const [selectedKit, setSelectedKit] = useState(null);
@@ -74,7 +78,8 @@ const BhishamDetails = () => {
   const [ExpiryCounts, setExpiryCounts] = useState({
     already_expired: 0,
     expiring_in_15_days: 0,
-    expiring_in_1_month: 0
+    expiring_in_1_month: 0,
+    pending_items_count: 0
   });
 
   const toggleDropdown = (id) => {
@@ -97,6 +102,27 @@ const BhishamDetails = () => {
     );
     setFilteredItems(filtered);
   }, [searchTermItems, items]);
+
+
+  const handleExpiryCard = async (typeid) => {
+    setActiveMotherBox(1);
+    setSelectedCube(1);
+    setSelectedKit(null);
+    setItems([]);
+    setActivePendingItems(0)
+    // Fetch kits for the selected cube
+    setLoadingKits(true);
+    try {
+      const response = await getExpiringData(id, typeid);
+      setKits(response);
+    } catch (error) {
+      toast.error('Failed to fetch kits');
+      console.error('Error fetching kits:', error);
+    } finally {
+      setLoadingKits(false);
+    }
+  };
+
 
   // Fetch bhisham details
 
@@ -150,6 +176,7 @@ const BhishamDetails = () => {
   // Function to handle mother box selection
   const handleMotherBoxSelect = async (motherBoxId) => {
     setActiveMotherBox(motherBoxId);
+    setActivePendingItems(0)
     setSelectedCube(null);
     setSelectedKit(null);
     setKits([]);
@@ -173,7 +200,7 @@ const BhishamDetails = () => {
     setSelectedCube(cubeId);
     setSelectedKit(null);
     setItems([]);
-
+    setActivePendingItems(0)
     // Fetch kits for the selected cube
     setLoadingKits(true);
     try {
@@ -188,15 +215,19 @@ const BhishamDetails = () => {
   };
 
   // Function to handle kit selection
-  const handleKitSelect = async (kitId, kitName) => {
-    console.log("kitIdc", kitId)
+  const handleKitSelect = async (kitId, kitName, mc_no, cube_number) => {
+   
     setSelectedKit(kitId);
     setSelectedKitName(kitName)
+    setActiveMotherBox(mc_no);
+    setSelectedCube(cube_number);
 
+    setActivePendingItems(0)
+    
     // Fetch items for the selected kit
     setLoadingItems(true);
     try {
-      const response = await getItemsByKit(id, activeMotherBox, selectedCube, kitName, bhisham.is_complete);
+      const response = await getItemsByKit(id, mc_no, cube_number, kitName, bhisham.is_complete);
       console.log('here is the response', response)
       setItems(response.data);
     } catch (error) {
@@ -205,6 +236,25 @@ const BhishamDetails = () => {
     } finally {
       setLoadingItems(false);
     }
+  };
+
+    // Function to handle kit selection
+  const handlePendingItems = async () => {
+      setActiveMotherBox(1);
+      setSelectedCube(1);
+      setSelectedKit(1);
+      setActivePendingItems(1)
+      setLoadingItems(true);
+      try {
+        const response = await getPendingItems(id);
+        console.log('here is the response', response)
+        setItems(response.data);
+      } catch (error) {
+        toast.error('Failed to fetch items');
+        console.error('Error fetching items:', error);
+      } finally {
+        setLoadingItems(false);
+      }
   };
 
   // Function to handle item click and show modal
@@ -359,10 +409,15 @@ const BhishamDetails = () => {
     setSelectedItem("");
     setDropdownOpen("");
     // fetchBhishamDetails()
-    handleKitSelect(selectedKit,  kits[selectedKit].kit_slug)
-
-
-
+    if(activePendingItems == 1){
+      handlePendingItems();
+     
+    }
+    else{
+      
+      handleKitSelect(selectedKit,  kits[selectedKit].kit_slug,kits[selectedKit].mc_no,kits[selectedKit].cube_number)
+    }
+    fetchExpiredCount();
   }
 
   const handleUpdateModalClose = () => {
@@ -371,11 +426,16 @@ const BhishamDetails = () => {
     setDropdownOpen("");
     console.log(kits[selectedKit])
 
-    // fetchBhishamDetails()
-    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
-
-
-
+    if(activePendingItems == 1){
+      handlePendingItems();
+      
+    }
+    else{
+      
+      handleKitSelect(selectedKit,  kits[selectedKit].kit_slug,kits[selectedKit].mc_no,kits[selectedKit].cube_number)
+    
+    }
+    fetchExpiredCount();
   }
 
   const handleMarkAsUpdateModalClose = () => {
@@ -384,9 +444,15 @@ const BhishamDetails = () => {
     setDropdownOpen("");
     // fetchBhishamDetails()
     console.log(kits, selectedKit,kits[selectedKit])
-
-    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
-
+    if(activePendingItems == 1){
+      handlePendingItems();
+      
+    }
+    else{
+      
+      handleKitSelect(selectedKit,  kits[selectedKit].kit_slug,kits[selectedKit].mc_no,kits[selectedKit].cube_number)
+    }
+    fetchExpiredCount();
   }
 
   const handleAddModalClose = () => {
@@ -394,7 +460,13 @@ const BhishamDetails = () => {
     setDropdownOpen("");
     // fetchBhishamDetails()
     console.log(kits, selectedKit,kits[selectedKit])
-    handleKitSelect(selectedKit, kits[selectedKit].kit_slug)
+    if(activePendingItems == 1){
+      handlePendingItems();
+    }
+    else{ 
+      handleKitSelect(selectedKit,  kits[selectedKit].kit_slug,kits[selectedKit].mc_no,kits[selectedKit].cube_number)
+    }
+    fetchExpiredCount();
   }
 
 
@@ -474,29 +546,40 @@ const BhishamDetails = () => {
         </div>
       </div>
       {/* Expiry count card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mb-4">
-           
-          <ExpiryCard
-            title="Nearby Expiry 1 Month"
-            count={ExpiryCounts.expiring_in_1_month}
-            icon="../kit.jpeg"
-            color="bg-lime-500"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+        <ExpiryCard
+          title="Nearby Expiry 1 Month"
+          count={ExpiryCounts.expiring_in_1_month}
+          icon="../kit.jpeg"
+          color="bg-lime-500"
+          onClick={() => handleExpiryCard(3)}
+        />
+
+        <ExpiryCard
+          title="Nearby Expiry 15 Days"
+          count={ExpiryCounts.expiring_in_15_days}
+          icon="../kit.jpeg"
+          color="bg-yellow-500"
+          onClick={() => handleExpiryCard(2)}
+        />
+
+        <ExpiryCard
+          title="Expired Kits"
+          count={ExpiryCounts.already_expired}
+          icon="../kit.jpeg"
+          color="bg-red-500"
+          onClick={() => handleExpiryCard(1)}
+        />
 
           <ExpiryCard
-            title="Nearby Expiry 15 Days"
-            count={ExpiryCounts.expiring_in_15_days}
-            icon="../kit.jpeg"
-            color="bg-yellow-500"
-          />
+          title="Pending Items"
+          count={ExpiryCounts.pending_items_count}
+          icon="../kit.jpeg"
+          color="bg-gray-500"
+          onClick={() => handlePendingItems()}
+        />
+      </div>
 
-          <ExpiryCard
-            title="Expired Kits"
-            count={ExpiryCounts.already_expired}
-            icon="../kit.jpeg"
-            color="bg-red-500"
-          />
-        </div>
       
       {/* Mother boxes selection */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -618,7 +701,7 @@ const BhishamDetails = () => {
                     return (
                       <button
                         key={index}
-                        onClick={() => handleKitSelect(index, kit.kit_slug)}
+                        onClick={() => handleKitSelect(index, kit.kit_slug, kit.mc_no, kit.cube_number)}
 
                         className={`w-full p-3 text-left rounded-md flex items-center justify-between ${selectedKit === index
                           ? 'bg-primary text-white'
@@ -660,7 +743,7 @@ const BhishamDetails = () => {
             <div className="p-6 border-b sticky top-0 bg-white z-10 flex justify-between items-center" style={{ padding: '1rem' }}>
               <h3 className="text-lg font-medium text-gray-700">Items</h3>
               <div className="flex justify-between items-center gap-5">
-                {bhisham && !bhisham.is_bhisham_close && <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />}
+                {bhisham && !bhisham.is_bhisham_close && activePendingItems==0 && <FiPlusCircle className="h-5 w-5" onClick={() => handleAddItem()} />}
                 <input
                   type="text"
                   placeholder="Search Items..."
@@ -716,7 +799,7 @@ const BhishamDetails = () => {
                             </p>
 
                             <p className="text-xs text-gray-600">
-                              <span className="font-medium">Qty:</span> {item.sku_qty || 'N/A'}
+                            <span className="font-medium">Required Qty:</span> {item.sku_available_qty || 'N/A'} <span className="font-medium"> | Qty:</span> {item.sku_qty || 'N/A'}
                             </p>
                             <p className="text-xs text-gray-600">
                               <span className="font-medium">MFD:</span> {item.mfd || 'N/A'}
@@ -778,7 +861,6 @@ const BhishamDetails = () => {
         </div>
       )
       }
-
       {/* Item Detail Modal */}
       <ItemDetailModal
         isOpen={isModalOpen}

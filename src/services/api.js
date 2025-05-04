@@ -52,7 +52,7 @@ export const getExpiredKits = async (bhishamId) => {
   try {
     console.log('Inside api post create User request')
     const response = await api.get(`/dashboard/get-expired-kits?bhishamid=${bhishamId}`);
-    console.log('user-response', response?.data?.data)
+    //console.log('user-response', response?.data?.data)
     return response?.data?.data
   } catch (err) {
     console.error('Error creating user:', err);
@@ -471,6 +471,39 @@ export const markAsUpdateItems = async (itemData, complete) => {
     return response.data;
   } catch (error) {
     console.error('Error creating user:', error);
+    throw error;
+  }
+};
+
+export const getPendingItems = async (bhishamId) => {
+  try {
+    console.log('Fetching pending items for bhisham:', bhishamId);
+    const response = await api.get(`/dashboard/get-pending-items?bhishamid=${bhishamId}`);
+    return response?.data;
+  } catch (error) {
+    console.log('Error fetching pending items:', error);
+    throw error;
+  }
+};
+
+export const getExpiringData = async (bhishamId, typeid) => {
+  try {
+    console.log('Fetching pending items for bhisham:', bhishamId);
+    const response = await api.get(`/dashboard/get-expiring-data?bhishamid=${bhishamId}&typeid=${typeid}`);
+    return response?.data?.data
+  } catch (error) {
+    console.log('Error fetching pending items:', error);
+    throw error;
+  }
+};
+
+export const getExpireByType = async (bhishamId, typeid) => {
+  try {
+    console.log('Fetching pending items for bhisham:', bhishamId);
+    const response = await api.get(`/dashboard/get-expire-by-type?bhishamid=${bhishamId}&typeid=${typeid}`);
+    return response?.data?.data
+  } catch (error) {
+    console.log('Error fetching pending items:', error);
     throw error;
   }
 };
