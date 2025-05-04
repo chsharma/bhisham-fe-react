@@ -56,7 +56,8 @@ const Dashboard = () => {
   const [ExpiryCounts, setExpiryCounts] = useState({
     already_expired: 0,
     expiring_in_15_days: 0,
-    expiring_in_1_month: 0
+    expiring_in_1_month: 0,
+    kit_shorts: 0
   });
 
   const [loading, setLoading] = useState(true);
@@ -76,6 +77,9 @@ const Dashboard = () => {
         } else if (type === '1month') {
           kits = await getExpireByType(0, 3);
           setExpiryModalTitle('Kits Expiring in 1 Month');
+        } else if (type === 'Kit Shorts') { 
+          kits = await getExpireByType(0, 4);
+          setExpiryModalTitle('Kits Shorts');
         }
         setExpiryKits(kits || []);
       } catch (error) {
@@ -179,6 +183,14 @@ const Dashboard = () => {
           icon="../kit.jpeg"
           color="bg-red-500"
           onClick={() => handleExpiryCardClick('expired')}
+        />
+
+        <ExpiryCard
+          title="Kits Shorts"
+          count={ExpiryCounts.kit_shorts}
+          icon="../kit.jpeg"
+          color="bg-red-500"
+          onClick={() => handleExpiryCardClick('Kit Shorts')}
         />
         </div>
 

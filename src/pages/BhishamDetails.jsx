@@ -79,7 +79,8 @@ const BhishamDetails = () => {
     already_expired: 0,
     expiring_in_15_days: 0,
     expiring_in_1_month: 0,
-    pending_items_count: 0
+    pending_items_count: 0,
+    kit_shorts : 0
   });
 
   const toggleDropdown = (id) => {
@@ -546,7 +547,14 @@ const BhishamDetails = () => {
         </div>
       </div>
       {/* Expiry count card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+      <ExpiryCard
+          title="Kits Shorts"
+          count={ExpiryCounts.kit_shorts}
+          icon="../kit.jpeg"
+          color="bg-lime-500"
+          onClick={() => handleExpiryCard(4)}
+        />
         <ExpiryCard
           title="Nearby Expiry 1 Month"
           count={ExpiryCounts.expiring_in_1_month}
