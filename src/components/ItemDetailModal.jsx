@@ -88,26 +88,40 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
   const getLastDayOfMonth = (year, month) => {
     return new Date(year, month, 0).getDate();
   };
-
 const handleSubmit = async () => {
   try {
-    // Convert month/year to full date (last day of month for expiration)
-    let mfd = '';
-    if (formData.mfd_month && formData.mfd_year) {
-      if (formData.mfd_month === 'NA') {
+    // Helper function to validate and format date parts
+    const formatDatePart = (value) => {
+      if (value === 'NA' || value === '' || isNaN(parseInt(value, 10))) {
+        return 'NA';
+      }
+      return value.padStart(2, '0'); // Ensure two digits
+    };
+
+    // Process MFD date
+    let mfd = null;
+    if (formData.mfd_month || formData.mfd_year) {
+      const month = formatDatePart(formData.mfd_month);
+      const year = formatDatePart(formData.mfd_year);
+      
+      if (month === 'NA' || year === 'NA') {
         mfd = 'NA';
       } else {
-        mfd = `${formData.mfd_year}-${formData.mfd_month}-01`;
+        mfd = `${year}-${month}-01`;
       }
     }
-    
-    let exp = '';
-    if (formData.exp_month && formData.exp_year) {
-      if (formData.exp_month === 'NA') {
+
+    // Process EXP date
+    let exp = null;
+    if (formData.exp_month || formData.exp_year) {
+      const month = formatDatePart(formData.exp_month);
+      const year = formatDatePart(formData.exp_year);
+      
+      if (month === 'NA' || year === 'NA') {
         exp = 'NA';
       } else {
-        const lastDay = getLastDayOfMonth(parseInt(formData.exp_year), parseInt(formData.exp_month));
-        exp = `${formData.exp_year}-${formData.exp_month}-${lastDay}`;
+        const lastDay = getLastDayOfMonth(parseInt(year), parseInt(month));
+        exp = `${year}-${month}-${lastDay}`;
       }
     }
 
@@ -120,8 +134,8 @@ const handleSubmit = async () => {
       sku_code: item.sku_code,
       sku_slug: item.sku_slug,
       batch_code: formData.batch_no_sr_no,
-      mfd: mfd || null, // Will be 'NA' if set, null if empty
-      exp: exp || null, // Will be 'NA' if set, null if empty
+      mfd: mfd, // Will be 'NA', valid date string, or null
+      exp: exp, // Will be 'NA', valid date string, or null
       id: item.id,
       update_typeid: formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0,
       manufactured_by: formData.manufactured_by,
