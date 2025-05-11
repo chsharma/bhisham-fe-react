@@ -89,47 +89,55 @@ const ItemDetailModal = ({ isOpen, onClose, item, bhisham, completed }) => {
     return new Date(year, month, 0).getDate();
   };
 
-  const handleSubmit = async () => {
-    try {
-      // Convert month/year to full date (last day of month for expiration)
-      let mfd = '';
-      if (formData.mfd_month && formData.mfd_year) {
+const handleSubmit = async () => {
+  try {
+    // Convert month/year to full date (last day of month for expiration)
+    let mfd = '';
+    if (formData.mfd_month && formData.mfd_year) {
+      if (formData.mfd_month === 'NA') {
+        mfd = 'NA';
+      } else {
         mfd = `${formData.mfd_year}-${formData.mfd_month}-01`;
       }
-      
-      let exp = '';
-      if (formData.exp_month && formData.exp_year) {
+    }
+    
+    let exp = '';
+    if (formData.exp_month && formData.exp_year) {
+      if (formData.exp_month === 'NA') {
+        exp = 'NA';
+      } else {
         const lastDay = getLastDayOfMonth(parseInt(formData.exp_year), parseInt(formData.exp_month));
         exp = `${formData.exp_year}-${formData.exp_month}-${lastDay}`;
       }
-
-      const data = {
-        bhisham_id: bhisham.id,
-        mc_no: item.mc_no,
-        cube_number: item.cube_number,
-        kit_code: item.kit_code,
-        kit_slug: item.kit_slug,
-        sku_code: item.sku_code,
-        sku_slug: item.sku_slug,
-        batch_code: formData.batch_no_sr_no,
-        mfd: mfd || null, // Send null if empty
-        exp: exp || null, // Send null if empty
-        id: item.id,
-        update_typeid: formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0,
-        manufactured_by: formData.manufactured_by,
-        sku_qty: parseInt(formData.sku_qty, 10) || 0,
-      };
-
-      await updateItems(data, completed);
-      toast.success('Item updated successfully!');
-      setFormData({});
-      setIsEditing(false);
-      onClose();
-    } catch (error) {
-      toast.error('Failed to update item');
-      console.error(error);
     }
-  };
+
+    const data = {
+      bhisham_id: bhisham.id,
+      mc_no: item.mc_no,
+      cube_number: item.cube_number,
+      kit_code: item.kit_code,
+      kit_slug: item.kit_slug,
+      sku_code: item.sku_code,
+      sku_slug: item.sku_slug,
+      batch_code: formData.batch_no_sr_no,
+      mfd: mfd || null, // Will be 'NA' if set, null if empty
+      exp: exp || null, // Will be 'NA' if set, null if empty
+      id: item.id,
+      update_typeid: formData.update_typeid ? parseInt(formData.update_typeid, 10) : 0,
+      manufactured_by: formData.manufactured_by,
+      sku_qty: parseInt(formData.sku_qty, 10) || 0,
+    };
+
+    await updateItems(data, completed);
+    toast.success('Item updated successfully!');
+    setFormData({});
+    setIsEditing(false);
+    onClose();
+  } catch (error) {
+    toast.error('Failed to update item');
+    console.error(error);
+  }
+};
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
