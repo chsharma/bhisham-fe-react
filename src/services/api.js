@@ -475,6 +475,21 @@ export const markAsUpdateItems = async (itemData, complete) => {
   }
 };
 
+export const updateBhisham = async (itemData) => {
+
+  try {
+    console.log('Inside api post update Item request', itemData)
+
+    let url = '/bhisham/update-bhisham'
+    const response = await api.post(url, JSON.stringify(itemData));
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+};
+
+
 export const getPendingItems = async (bhishamId) => {
   try {
     console.log('Fetching pending items for bhisham:', bhishamId);

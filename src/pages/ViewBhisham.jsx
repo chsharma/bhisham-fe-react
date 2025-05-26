@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getAllBhisham, completeBhisham, getBhishamRawData, getBhishamFullData } from '../services/api';
-import { FiSearch, FiRefreshCw, FiCheck, FiEye, FiChevronLeft, FiChevronRight, FiDownload } from 'react-icons/fi';
+import { getAllBhisham, completeBhisham, getBhishamRawData, getBhishamFullData, updateBhisham } from '../services/api';
+import { FiSearch, FiRefreshCw, FiCheck, FiEye, FiChevronLeft, FiChevronRight, FiDownload, FiEdit, FiX, FiSave } from 'react-icons/fi';
 
 const ViewBhisham = () => {
   const [bhishamList, setBhishamList] = useState([]);
@@ -10,6 +10,11 @@ const ViewBhisham = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [processingIds, setProcessingIds] = useState([]);
   const [downloadingIds, setDownloadingIds] = useState({});
+  const [editingId, setEditingId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    bhisham_name: '',
+    serial_no: ''
+  });
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,10 +61,68 @@ const ViewBhisham = () => {
     try {
       const response = await completeBhisham(id);
       fetchBhishamList();
-
       toast.success('Bhishm marked as complete');
     } catch (error) {
       toast.error('Failed to complete Bhishm');
+    } finally {
+      setProcessingIds((prev) => prev.filter((item) => item !== id));
+    }
+  };
+
+  // Handle edit button click
+  const handleEdit = (bhisham) => {
+    setEditingId(bhisham.id);
+    setEditFormData({
+      bhisham_name: bhisham.bhisham_name || '',
+      serial_no: bhisham.serial_no || ''
+    });
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditFormData({
+      bhisham_name: '',
+      serial_no: ''
+    });
+  };
+
+  // Handle form input changes
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle update submission
+  const handleUpdate = async (id) => {
+    if (!editFormData.bhisham_name || !editFormData.serial_no) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setProcessingIds((prev) => [...prev, id]);
+
+    try {
+      const updateData = {
+        bhisham_id: id,
+        serial_no: editFormData.serial_no,
+        bhisham_name: editFormData.bhisham_name
+      };
+
+      const response = await updateBhisham(updateData);
+      if (response && response.success) {
+        toast.success('Bhishm updated successfully');
+        fetchBhishamList();
+        setEditingId(null);
+      } else {
+        toast.error(response?.message || 'Failed to update Bhishm');
+      }
+    } catch (error) {
+      console.error('Error updating Bhishm:', error);
+      toast.error('Failed to update Bhishm');
     } finally {
       setProcessingIds((prev) => prev.filter((item) => item !== id));
     }
@@ -155,51 +218,50 @@ const ViewBhisham = () => {
   };
 
   // Helper function to convert data to CSV and trigger download
-const downloadCSV = (data, filename) => {
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    toast.error('No data to download');
-    return;
-  }
+  const downloadCSV = (data, filename) => {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      toast.error('No data to download');
+      return;
+    }
 
-  // Get headers from the first object
-  const headers = Object.keys(data[0]);
+    // Get headers from the first object
+    const headers = Object.keys(data[0]);
 
-  // Create CSV rows
-  const csvRows = [];
+    // Create CSV rows
+    const csvRows = [];
 
-  // Add header row
-  csvRows.push(headers.join(','));
+    // Add header row
+    csvRows.push(headers.join(','));
 
-  // Add data rows
-  for (const row of data) {
-    const values = headers.map(header => {
-      const value = row[header];
-      if (value === null || value === undefined) return '';
+    // Add data rows
+    for (const row of data) {
+      const values = headers.map(header => {
+        const value = row[header];
+        if (value === null || value === undefined) return '';
 
-      const strValue = String(value);
-      // Wrap in double quotes if value contains special characters
-      return /[,"\n\r]/.test(strValue) ? `"${strValue}"` : strValue;
-    });
-    csvRows.push(values.join(','));
-  }
+        const strValue = String(value);
+        // Wrap in double quotes if value contains special characters
+        return /[,"\n\r]/.test(strValue) ? `"${strValue}"` : strValue;
+      });
+      csvRows.push(values.join(','));
+    }
 
-  // Create a CSV string
-  const csvString = csvRows.join('\n');
+    // Create a CSV string
+    const csvString = csvRows.join('\n');
 
-  // Create blob and download link
-  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-  link.style.visibility = 'hidden';
+    // Create blob and download link
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.csv`);
+    link.style.visibility = 'hidden';
 
-  // Append to the body, trigger download, and clean up
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
+    // Append to the body, trigger download, and clean up
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Helper function to format date for filename
   const formatDate = (date) => {
@@ -246,38 +308,46 @@ const downloadCSV = (data, filename) => {
             <table className="min-w-full bg-white border rounded-lg shadow-sm">
               <thead className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <tr>
-                  <th className="py-4 px-6">                    Name
-                  </th>
-                  <th className="py-4 px-6">                    Serial No
-                  </th>
-                  <th className="py-4 px-6">                    Created By
-                  </th>
-                  <th className="py-4 px-6">                    Status
-                  </th>
-                  <th className="py-4 px-6">                    Mark as complete
-                  </th>
-                  <th className="py-4 px-6">                    Actions
-                  </th>
+                  <th className="py-4 px-6">Name</th>
+                  <th className="py-4 px-6">Serial No</th>
+                  <th className="py-4 px-6">Created By</th>
+                  <th className="py-4 px-6">Status</th>
+                  <th className="py-4 px-6">Mark as complete</th>
+                  <th className="py-4 px-6">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentItems.length > 0 ? (
                   currentItems.map((bhisham, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                      <td className="py-4 px-6">                      
-                          {/* <div className="text-sm font-medium text-gray-900"> */}
-                        {bhisham?.bhisham_name ? bhisham.bhisham_name : '-'}
-                      {/* </div> */}
+                      <td className="py-4 px-6">
+                        {editingId === bhisham.id ? (
+                          <input
+                            type="text"
+                            name="bhisham_name"
+                            value={editFormData.bhisham_name}
+                            onChange={handleEditChange}
+                            className="input input-sm w-full"
+                          />
+                        ) : (
+                          bhisham?.bhisham_name ? bhisham.bhisham_name : '-'
+                        )}
                       </td>
-                      <td className="py-4 px-6">              
-                                  {/* <div className="text-sm text-gray-500"> */}
-                          {bhisham?.serial_no}
-                        {/* </div> */}
+                      <td className="py-4 px-6">
+                        {editingId === bhisham.id ? (
+                          <input
+                            type="text"
+                            name="serial_no"
+                            value={editFormData.serial_no}
+                            onChange={handleEditChange}
+                            className="input input-sm w-full"
+                          />
+                        ) : (
+                          bhisham?.serial_no || '-'
+                        )}
                       </td>
-                      <td className="py-4 px-6">                      
-                          {/* <div className="text-sm text-gray-500"> */}
-                          {bhisham?.created_by}
-                        {/* </div> */}
+                      <td className="py-4 px-6">
+                        {bhisham?.created_by || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bhisham.is_complete === 1
@@ -312,49 +382,85 @@ const downloadCSV = (data, filename) => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
-                          <Link
-                            to={`/bhisham/${bhisham.id}`}
-                            className="p-1 rounded-md text-blue-600 hover:bg-blue-100"
-                            title="View Details"
-                          >
-                            <FiEye className="h-5 w-5" />
-                          </Link>
-                          <button
-                            onClick={() => handleDownloadRaw(bhisham.id)}
-                            disabled={downloadingIds[bhisham.id]?.raw}
-                            className="p-1 rounded-md text-green-600 hover:bg-green-100"
-                            title="Download Raw Data"
-                          >
-                            {downloadingIds[bhisham.id]?.raw ? (
-                              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                            ) : (
-                              <div className="flex items-center">
-                                <FiDownload className="h-5 w-5" />
-                                <span className="ml-1 text-xs">Raw</span>
-                              </div>
-                            )}
-                          </button>
-                          <button
-                            onClick={() => handleDownloadFull(bhisham.id)}
-                            disabled={downloadingIds[bhisham.id]?.full}
-                            className="p-1 rounded-md text-indigo-600 hover:bg-indigo-100"
-                            title="Download Full Data"
-                          >
-                            {downloadingIds[bhisham.id]?.full ? (
-                              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                            ) : (
-                              <div className="flex items-center">
-                                <FiDownload className="h-5 w-5" />
-                                <span className="ml-1 text-xs">Full</span>
-                              </div>
-                            )}
-                          </button>
+                          {editingId === bhisham.id ? (
+                            <>
+                              <button
+                                onClick={() => handleUpdate(bhisham.id)}
+                                disabled={processingIds.includes(bhisham.id)}
+                                className="p-1 rounded-md text-green-600 hover:bg-green-100"
+                                title="Save Changes"
+                              >
+                                {processingIds.includes(bhisham.id) ? (
+                                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  <FiSave className="h-5 w-5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="p-1 rounded-md text-red-600 hover:bg-red-100"
+                                title="Cancel"
+                              >
+                                <FiX className="h-5 w-5" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <Link
+                                to={`/bhisham/${bhisham.id}`}
+                                className="p-1 rounded-md text-blue-600 hover:bg-blue-100"
+                                title="View Details"
+                              >
+                                <FiEye className="h-5 w-5" />
+                              </Link>
+                              <button
+                                onClick={() => handleEdit(bhisham)}
+                                className="p-1 rounded-md text-yellow-600 hover:bg-yellow-100"
+                                title="Edit"
+                              >
+                                <FiEdit className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDownloadRaw(bhisham.id)}
+                                disabled={downloadingIds[bhisham.id]?.raw}
+                                className="p-1 rounded-md text-green-600 hover:bg-green-100"
+                                title="Download Raw Data"
+                              >
+                                {downloadingIds[bhisham.id]?.raw ? (
+                                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  <div className="flex items-center">
+                                    <FiDownload className="h-5 w-5" />
+                                    <span className="ml-1 text-xs">Raw</span>
+                                  </div>
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleDownloadFull(bhisham.id)}
+                                disabled={downloadingIds[bhisham.id]?.full}
+                                className="p-1 rounded-md text-indigo-600 hover:bg-indigo-100"
+                                title="Download Full Data"
+                              >
+                                {downloadingIds[bhisham.id]?.full ? (
+                                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  <div className="flex items-center">
+                                    <FiDownload className="h-5 w-5" />
+                                    <span className="ml-1 text-xs">Full</span>
+                                  </div>
+                                )}
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
