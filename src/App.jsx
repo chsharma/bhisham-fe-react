@@ -27,6 +27,7 @@ import ViewBhisham from './pages/ViewBhisham';
 import CreateBhisham from './pages/CreateBhisham';
 import BhishamDetails from './pages/BhishamDetails';
 import ViewExpiry from './pages/ViewExpiry';
+import ManufacturePage from './pages/stock/master/CreateManufacure';
 
 // Layout
 import Layout from './components/Layout';
@@ -36,6 +37,7 @@ import { AuthProvider } from './context/AuthContext';
 import GetUsers from './pages/GetUsers';
 import UpdatePassword from './pages/UpdatePassword';
 import Updateuser from './pages/UpdateUser';
+
 
 function App() {
   return (
@@ -55,6 +57,7 @@ function App() {
             <Route path="view-kits-expiry-and-shorts" element={<ViewExpiry/>} />
             <Route path="create-bhisham" element={<CreateBhisham />} />
             <Route path="bhisham/:id" element={<BhishamDetails />} />
+            <Route path="stock/master/create-manufacture" element={<ManufacturePage />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -523,5 +523,41 @@ export const getExpireByType = async (bhishamId, typeid) => {
   }
 };
 
+export const getAllManufacturers = async () => {
+  try {
+    const response = await api.get('/stock/get-manufacturers');
+    return response.data
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createManufacturer = async (data) => {
+  try {
+    const response = await api.post('stock/create-manufacturers', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateManufacturer = async (id, data) => {
+  try {
+    const response = await api.put(`stock/update-manufacturers/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteManufacturer = async (id) => {
+  try {
+    const response = await api.delete(`stock/delete-manufacturers/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export default api;

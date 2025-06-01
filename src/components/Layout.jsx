@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMenu, FiX, FiHome, FiUser, FiPackage, FiChevronDown, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiUser, FiPackage, FiChevronDown, FiLogOut, FiBox } from 'react-icons/fi';
 import { getAllUser } from '../services/api';
 
 const Layout = () => {
@@ -12,6 +12,7 @@ const Layout = () => {
   const [bhishamDropdownOpen, setBhishamDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [stockDropdownOpen, setStockDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -26,8 +27,11 @@ const Layout = () => {
     setBhishamDropdownOpen(!bhishamDropdownOpen);
   };
 
-  const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
+  const toggleStockDropdown = () => {
+    setStockDropdownOpen(!stockDropdownOpen);
+  };
 
+  const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
 
   const toggleUserDropdown = () => {
     setUserDropdownOpen(!userDropdownOpen);
@@ -41,13 +45,11 @@ const Layout = () => {
 
   const navigateToUpdateUser = () => {
     navigate('/update-user', {state:{data:user}})
-   }
-
+  }
 
   const navigateToUpdatePassword = () => {
     console.log('inside this')
     console.log('user', user)
-    // navigate('/update-password', {state:{user}})
     navigate('/update-password', {state: {data: user}})
   }
 
@@ -65,18 +67,11 @@ const Layout = () => {
         }`}
       >
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
-
           <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHM CUBE</h2>
-          {/* <img 
-            src="image.jpeg"// Replace "logo.png" with your actual image file name
-            alt="Bhishm App Logo" 
-            className="h-auto w-auto" // Adjust height/width as needed
-          /> */}
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
           >
-
             <FiX className="w-6 h-6 text-white" />
           </button>
         </div>
@@ -103,8 +98,8 @@ const Layout = () => {
               className="flex items-center justify-between w-full px-6 py-4 text-gray-300 bg-gray-800 rounded-xl shadow-md transition hover:bg-blue-500 hover:text-white"
             >
               <div className="flex items-center gap-4">
-                <FiPackage className="w-6 h-6" />
-                <span className="text-lg font-medium">Create User</span>
+                <FiUser className="w-6 h-6" />
+                <span className="text-lg font-medium">User Management</span>
               </div>
               <FiChevronDown
                 className={`transition-transform duration-300 ${
@@ -171,6 +166,36 @@ const Layout = () => {
               </div>
             )}
           </div>
+
+          {/* New Stock Menu */}
+          <div>
+            <button
+              onClick={toggleStockDropdown}
+              className="flex items-center justify-between w-full px-6 py-4 text-gray-300 bg-gray-800 rounded-xl shadow-md transition hover:bg-blue-500 hover:text-white"
+            >
+              <div className="flex items-center gap-4">
+                <FiBox className="w-6 h-6" />
+                <span className="text-lg font-medium">Stock</span>
+              </div>
+              <FiChevronDown
+                className={`transition-transform duration-300 ${
+                  stockDropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {stockDropdownOpen && (
+              <div className="ml-8 mt-2 space-y-4">
+                <NavLink
+                  to="stock/master/create-manufacture"
+                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
+                >
+                  Create Manufacturer
+                </NavLink>
+                {/* Add more stock-related links here as needed */}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* User Profile & Logout */}
@@ -207,12 +232,13 @@ const Layout = () => {
             {location.pathname === '/create-user' && 'Create User'}
             {location.pathname === '/view-bhisham' && 'View Bhishm'}
             {location.pathname === '/create-bhisham' && 'Create Bhishm'}
+            {location.pathname === '/create-manufacturer' && 'Create Manufacturer'}
           </h1>
 
           <img 
-            src="image.jpeg"// Replace "logo.png" with your actual image file name
+            src="/image.jpeg"
             alt="Bhishm App Logo" 
-            className="h-auto w-auto" // Adjust height/width as needed
+            className="h-auto w-auto" 
             style ={{height  : "4rem"}}
           />
 
@@ -225,8 +251,6 @@ const Layout = () => {
               <span className="text-lg font-medium text-gray-700">{user.name}</span>
               <FiChevronDown className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-
-            
 
             {profileDropdownOpen && (
               <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-xl">
