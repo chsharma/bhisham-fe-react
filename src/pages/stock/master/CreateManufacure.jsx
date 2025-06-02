@@ -37,7 +37,7 @@ const ManufacturerPage = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Fetch all manufacturers
   const fetchManufacturers = async () => {
@@ -279,31 +279,56 @@ const ManufacturerPage = () => {
               </div>
               
               <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  onClick={handleFormClose}
-                  className="btn btn-secondary"
-                >
-                  <FiX className="mr-1" /> Cancel
-                </button>
-                <button
-                  onClick={currentManufacturer ? handleUpdate : handleCreate}
-                  disabled={processingIds.includes(currentManufacturer?.id || 'create')}
-                  className="btn btn-primary"
-                >
-                  {processingIds.includes(currentManufacturer?.id || 'create') ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : (
-                    <span className="flex items-center">
-                      <FiSave className="mr-1" /> {currentManufacturer ? 'Update' : 'Save'}
-                    </span>
-                  )}
-                </button>
+               <div className="mt-6 flex justify-end space-x-3">
+  <button
+    onClick={handleFormClose}
+    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-400"
+  >
+    <FiX className="mr-2" />
+    Cancel
+  </button>
+
+  <button
+    onClick={currentManufacturer ? handleUpdate : handleCreate}
+    disabled={processingIds.includes(currentManufacturer?.id || 'create')}
+    className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white transition
+      ${processingIds.includes(currentManufacturer?.id || 'create')
+        ? 'bg-blue-300 cursor-not-allowed'
+        : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500'}`}
+  >
+    {processingIds.includes(currentManufacturer?.id || 'create') ? (
+      <span className="flex items-center">
+        <svg
+          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        Processing...
+      </span>
+    ) : (
+      <span className="flex items-center">
+        <FiSave className="mr-2" />
+        {currentManufacturer ? 'Update' : 'Save'}
+      </span>
+    )}
+  </button>
+</div>
+
               </div>
             </div>
           </div>
@@ -381,53 +406,45 @@ const ManufacturerPage = () => {
               </tbody>
             </table>
           </div>
+        {/* Pagination */}
+          {filteredManufacturers.length > 0 ? (
+            <>
+              <div className="mt-4 flex justify-between items-center">
+                <div>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 rounded flex items-center ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  >
+                    <FiChevronLeft className="mr-1" /> Previous
+                  </button>
+                </div>
 
-          {/* Pagination */}
-          {filteredManufacturers.length > 0 && (
-            <div className="px-6 py-4 flex flex-col sm:flex-row justify-between items-center border-t border-gray-200">
-              <div className="flex items-center mb-4 sm:mb-0">
-                <span className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
-                  <span className="font-medium">
-                    {Math.min(indexOfLastItem, filteredManufacturers.length)}
-                  </span>{' '}
-                  of <span className="font-medium">{filteredManufacturers.length}</span> results
-                </span>
+                <div className="flex space-x-2">
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`px-3 py-1 rounded ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <div>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-1 rounded flex items-center ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  >
+                    Next <FiChevronRight className="ml-1" />
+                  </button>
+                </div>
               </div>
-
-              <div className="flex items-center space-x-2">
-                <select
-                  className="form-select rounded-md border-gray-300 shadow-sm text-sm"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                >
-                  <option value={5}>5 per page</option>
-                  <option value={10}>10 per page</option>
-                  <option value={25}>25 per page</option>
-                  <option value={50}>50 per page</option>
-                </select>
-
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`p-2 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <FiChevronLeft />
-                </button>
-
-                <span className="text-sm text-gray-700">
-                  Page {currentPage} of {totalPages}
-                </span>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages || totalPages === 0}
-                  className={`p-2 rounded-md ${currentPage === totalPages || totalPages === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  <FiChevronRight />
-                </button>
-              </div>
-            </div>
+            </>
+          ) : (
+            <p className="text-gray-500 text-center py-10">No users found.</p>
           )}
         </div>
       )}

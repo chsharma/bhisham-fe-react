@@ -37,6 +37,7 @@ import { AuthProvider } from './context/AuthContext';
 import GetUsers from './pages/GetUsers';
 import UpdatePassword from './pages/UpdatePassword';
 import Updateuser from './pages/UpdateUser';
+import CreateSupplier from './pages/stock/master/CreateSupplier';
 
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
             <Route path="create-bhisham" element={<CreateBhisham />} />
             <Route path="bhisham/:id" element={<BhishamDetails />} />
             <Route path="stock/master/create-manufacture" element={<ManufacturePage />} />
+            <Route path="stock/master/create-supplier" element={<CreateSupplier />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

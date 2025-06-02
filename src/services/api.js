@@ -559,5 +559,42 @@ export const deleteManufacturer = async (id) => {
   }
 };
 
+export const getAllSuppliers = async () => {
+  try {
+    const response = await api.get('/stock/get-suppliers');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const createSupplier = async (data) => {
+  try {
+    const response = await api.post('/stock/create-suppliers', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateSupplier = async (id, data) => {
+  try {
+    const response = await api.put(`/stock/update-suppliers/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteSupplier = async (id) => {
+  try {
+    const response = await api.delete(`/stock/delete-suppliers/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export default api;

@@ -1,274 +1,197 @@
-import { useState } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { FiMenu, FiX, FiHome, FiUser, FiPackage, FiChevronDown, FiLogOut, FiBox } from 'react-icons/fi';
-import { getAllUser } from '../services/api';
+import { useState } from "react";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiUser,
+  FiPackage,
+  FiChevronDown,
+  FiLogOut,
+  FiBox,
+} from "react-icons/fi";
+import { getAllUser } from "../services/api";
 
 const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [bhishamDropdownOpen, setBhishamDropdownOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [stockDropdownOpen, setStockDropdownOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [nestedDropdown, setNestedDropdown] = useState(null);
+
+  const toggleDropdown = (key) => {
+    setOpenDropdown(prev => (prev === key ? null : key));
+    setNestedDropdown(null); // reset nested dropdown when parent toggled
+  };
+
+  const toggleNestedDropdown = (key) => {
+    setNestedDropdown(prev => (prev === key ? null : key));
+  };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const getAllUsers = async () => {
+    const data = await getAllUser(user);
+    navigate("/get-user", { state: { data } });
   };
-
-  const toggleBhishamDropdown = () => {
-    setBhishamDropdownOpen(!bhishamDropdownOpen);
-  };
-
-  const toggleStockDropdown = () => {
-    setStockDropdownOpen(!stockDropdownOpen);
-  };
-
-  const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
-
-  const toggleUserDropdown = () => {
-    setUserDropdownOpen(!userDropdownOpen);
-  }
-
-  const getAllUsers = async() => {
-    const data = await getAllUser(user)
-    console.log('data here is ',data)
-    navigate('/get-user', {state: {data: data}})
-  }
-
-  const navigateToUpdateUser = () => {
-    navigate('/update-user', {state:{data:user}})
-  }
-
-  const navigateToUpdatePassword = () => {
-    console.log('inside this')
-    console.log('user', user)
-    navigate('/update-password', {state: {data: user}})
-  }
 
   if (!user) {
-    navigate('/login');
+    navigate("/login");
     return null;
   }
 
+  const renderDropdown = (items) => (
+    <div className="ml-6 mt-2 bg-gray-900 border border-gray-700 p-2 rounded shadow-lg space-y-2">
+      {items.map(({ to, label, onClick }, idx) => (
+        <NavLink
+          key={idx}
+          to={to}
+          onClick={onClick}
+          className="block px-4 py-2 text-sm text-gray-300 hover:bg-blue-600 hover:text-white rounded transition"
+        >
+          {label}
+        </NavLink>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-300 text-gray-900">
+    <div className="container-fluid flex h-screen text-gray-900 px-0">
       {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] shadow-2xl transition-transform duration-300 lg:translate-x-0 lg:static ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-700">
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">BHISHM CUBE</h2>
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded-md lg:hidden hover:bg-gray-700 transition"
-          >
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transition-transform duration-300 lg:translate-x-0 lg:static ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
+          <h2 className="text-xl font-bold text-white">BHISHM CUBE</h2>
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
             <FiX className="w-6 h-6 text-white" />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="px-6 py-8 space-y-6">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl transition duration-300 shadow-md ${
-                isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:bg-blue-500 hover:text-white'
-              }`
-            }
-          >
-            <FiHome className="w-6 h-6" />
-            <span className="text-lg font-medium">Dashboard</span>
+        <nav className="px-4 py-6 space-y-4 overflow-y-auto">
+          <NavLink to="/" className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-2 rounded-md ${isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-blue-500 hover:text-white"}`
+          }>
+            <FiHome className="w-5 h-5" />
+            <span>Dashboard</span>
           </NavLink>
 
+          {/* User Management */}
           <div>
-            <button
-              onClick={toggleUserDropdown}
-              className="flex items-center justify-between w-full px-6 py-4 text-gray-300 bg-gray-800 rounded-xl shadow-md transition hover:bg-blue-500 hover:text-white"
-            >
-              <div className="flex items-center gap-4">
-                <FiUser className="w-6 h-6" />
-                <span className="text-lg font-medium">User Management</span>
-              </div>
-              <FiChevronDown
-                className={`transition-transform duration-300 ${
-                  userDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
+            <button onClick={() => toggleDropdown("user")} className="w-full flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-300 rounded hover:bg-blue-500 hover:text-white">
+              <span className="flex items-center gap-2">
+                <FiUser className="w-5 h-5" />
+                User Management
+              </span>
+              <FiChevronDown className={`${openDropdown === "user" ? "rotate-180" : ""} transition`} />
             </button>
-
-            {userDropdownOpen && (
-              <div className="ml-8 mt-2 space-y-4">
-                <NavLink
-                  to="/get-user"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                  onClick={getAllUsers}
-                >
-                  Get Users
-                </NavLink>
-                <NavLink
-                  to="/create-user"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                >
-                  Create Users
-                </NavLink>
-              </div>
-            )}
+            {openDropdown === "user" && renderDropdown([
+              { to: "/get-user", label: "Get Users", onClick: getAllUsers },
+              { to: "/create-user", label: "Create Users" },
+            ])}
           </div>
 
+          {/* Bhishm */}
           <div>
-            <button
-              onClick={toggleBhishamDropdown}
-              className="flex items-center justify-between w-full px-6 py-4 text-gray-300 bg-gray-800 rounded-xl shadow-md transition hover:bg-blue-500 hover:text-white"
-            >
-              <div className="flex items-center gap-4">
-                <FiPackage className="w-6 h-6" />
-                <span className="text-lg font-medium">Bhishm</span>
-              </div>
-              <FiChevronDown
-                className={`transition-transform duration-300 ${
-                  bhishamDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
+            <button onClick={() => toggleDropdown("bhisham")} className="w-full flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-300 rounded hover:bg-blue-500 hover:text-white">
+              <span className="flex items-center gap-2">
+                <FiPackage className="w-5 h-5" />
+                Bhishm
+              </span>
+              <FiChevronDown className={`${openDropdown === "bhisham" ? "rotate-180" : ""} transition`} />
             </button>
-
-            {bhishamDropdownOpen && (
-              <div className="ml-8 mt-2 space-y-4">
-                <NavLink
-                  to="/view-bhisham"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                >
-                  View Bhishm
-                </NavLink>
-                <NavLink
-                  to="/create-bhisham"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                >
-                  Create Bhishm
-                </NavLink>
-                <NavLink
-                  to="/view-kits-expiry-and-shorts"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                >
-                  View Kits Expiry & Shorts
-                </NavLink>
-              </div>
-            )}
+            {openDropdown === "bhisham" && renderDropdown([
+              { to: "/view-bhisham", label: "View Bhishm" },
+              { to: "/create-bhisham", label: "Create Bhishm" },
+              { to: "/view-kits-expiry-and-shorts", label: "View Kits Expiry & Shorts" },
+            ])}
           </div>
 
-          {/* New Stock Menu */}
+          {/* WMS with nested Master */}
           <div>
-            <button
-              onClick={toggleStockDropdown}
-              className="flex items-center justify-between w-full px-6 py-4 text-gray-300 bg-gray-800 rounded-xl shadow-md transition hover:bg-blue-500 hover:text-white"
-            >
-              <div className="flex items-center gap-4">
-                <FiBox className="w-6 h-6" />
-                <span className="text-lg font-medium">Stock</span>
-              </div>
-              <FiChevronDown
-                className={`transition-transform duration-300 ${
-                  stockDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
+            <button onClick={() => toggleDropdown("wms")} className="w-full flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-300 rounded hover:bg-blue-500 hover:text-white">
+              <span className="flex items-center gap-2">
+                <FiBox className="w-5 h-5" />
+                WMS
+              </span>
+              <FiChevronDown className={`${openDropdown === "wms" ? "rotate-180" : ""} transition`} />
             </button>
 
-            {stockDropdownOpen && (
-              <div className="ml-8 mt-2 space-y-4">
-                <NavLink
-                  to="stock/master/create-manufacture"
-                  className="block px-5 py-3 text-gray-300 transition hover:bg-blue-500 hover:text-white"
-                >
-                  Create Manufacturer
-                </NavLink>
-                {/* Add more stock-related links here as needed */}
+            {openDropdown === "wms" && (
+              <div className="ml-6 mt-2">
+                <button onClick={() => toggleNestedDropdown("master")} className="w-full flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-300 rounded hover:bg-blue-500 hover:text-white">
+                  <span>Master</span>
+                  <FiChevronDown className={`${nestedDropdown === "master" ? "rotate-180" : ""} transition`} />
+                </button>
+                {nestedDropdown === "master" && renderDropdown([
+                  { to: "/stock/master/create-supplier", label: " Supplier" },
+                  { to: "/stock/master/create-manufacture", label: " Manufacturer" },
+                ])}
               </div>
             )}
           </div>
         </nav>
 
-        {/* User Profile & Logout */}
-        <div className="absolute bottom-0 w-full p-6 bg-gray-900">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-blue-500 text-white flex items-center justify-center text-xl font-bold shadow-lg rounded-lg">
+        {/* Footer */}
+        <div className="absolute bottom-0 w-full p-4 bg-gray-900 border-t border-gray-800">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center rounded-md font-bold text-lg">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-md font-bold text-white">{user.name}</p>
-              <p className="text-sm text-gray-400">{user.role}</p>
+              <p className="text-white font-semibold text-sm">{user.name}</p>
+              <p className="text-gray-400 text-xs">{user.role}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-6 py-4 text-red-400 bg-gray-800 shadow-md hover:text-red-600 transition"
-          >
-            <FiLogOut className="w-6 h-6" />
-            <span>Logout</span>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-red-400 bg-gray-800 hover:text-red-600 rounded shadow">
+            <FiLogOut className="w-4 h-4" />
+            Logout
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white flex items-center justify-between px-12 border-b shadow-lg" style={{ height: '5rem' }}>
-          <button onClick={toggleSidebar} className="p-3 rounded-md lg:hidden hover:bg-gray-200 transition">
-            <FiMenu className="w-7 h-7 text-gray-600" />
+        <header className="bg-white flex items-center justify-between px-6 h-20 border-b shadow">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
+            <FiMenu className="w-6 h-6 text-gray-600" />
           </button>
-
-          <h1 className="text-4xl font-bold text-gray-800">
-            {location.pathname === '/' && 'Dashboard'}
-            {location.pathname === '/create-user' && 'Create User'}
-            {location.pathname === '/view-bhisham' && 'View Bhishm'}
-            {location.pathname === '/create-bhisham' && 'Create Bhishm'}
-            {location.pathname === '/create-manufacturer' && 'Create Manufacturer'}
+          <h1 className="text-xl font-bold text-gray-800">
+            {location.pathname === "/" && "Dashboard"}
+            {location.pathname === "/create-user" && "Create User"}
+            {location.pathname === "/view-bhisham" && "View Bhishm"}
+            {location.pathname === "/create-bhisham" && "Create Bhishm"}
+            {location.pathname.includes("create-manufacture") && "Create Manufacturer"}
           </h1>
-
-          <img 
-            src="/image.jpeg"
-            alt="Bhishm App Logo" 
-            className="h-auto w-auto" 
-            style ={{height  : "4rem"}}
-          />
-
-          {/* User Profile Section */}
-          <div className="relative">
-            <button onClick={toggleProfileDropdown} className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-lg font-bold rounded-full">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-lg font-medium text-gray-700">{user.name}</span>
-              <FiChevronDown className={`transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {profileDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-xl">
-                <div className="p-4 border-b">
-                  <p className="text-lg font-bold">{user.name}</p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+          <div className="flex items-center gap-4">
+            <img src="/image.jpeg" alt="Logo" className="h-10 w-auto" />
+            <div className="relative">
+              <button onClick={() => toggleDropdown("profile")} className="flex items-center gap-2">
+                <div className="w-9 h-9 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold">
+                  {user.name.charAt(0).toUpperCase()}
                 </div>
-                <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-4 text-red-400 hover:bg-gray-100">
-                  <FiLogOut className="w-6 h-6" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
+                <FiChevronDown className={`${openDropdown === "profile" ? "rotate-180" : ""} transition`} />
+              </button>
+              {openDropdown === "profile" && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow">
+                  <div className="p-4 border-b">
+                    <p className="font-bold">{user.name}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-gray-100">
+                    <FiLogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-12 bg-gray-100 rounded-tl-3xl shadow-inner">
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-100 rounded-tl-xl">
           <Outlet />
         </main>
       </div>
