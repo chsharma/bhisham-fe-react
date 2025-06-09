@@ -38,6 +38,9 @@ import GetUsers from './pages/GetUsers';
 import UpdatePassword from './pages/UpdatePassword';
 import Updateuser from './pages/UpdateUser';
 import CreateSupplier from './pages/stock/master/CreateSupplier';
+import CreateItem from './pages/stock/master/Createitem';
+import BatchPage from './pages/stock/master/CreateBatch';
+import CreateInwards from './pages/stock/master/CreateInwards';
 
 
 function App() {
@@ -60,6 +63,9 @@ function App() {
             <Route path="bhisham/:id" element={<BhishamDetails />} />
             <Route path="stock/master/create-manufacture" element={<ManufacturePage />} />
             <Route path="stock/master/create-supplier" element={<CreateSupplier />} />
+            <Route path="stock/master/create-item" element={<CreateItem />} />
+            <Route path="stock/master/create-batch" element={<BatchPage />} />
+            <Route path="stock/master/create-inward" element={<CreateInwards />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

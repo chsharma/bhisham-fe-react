@@ -129,10 +129,27 @@ const Layout = () => {
                 {nestedDropdown === "master" && renderDropdown([
                   { to: "/stock/master/create-supplier", label: " Supplier" },
                   { to: "/stock/master/create-manufacture", label: " Manufacturer" },
+                  { to: "/stock/master/create-item", label: "Item" },
+                  { to: "/stock/master/create-batch", label: "Batch" },
                 ])}
               </div>
             )}
           </div>
+
+          <button
+  onClick={() => toggleNestedDropdown("inward")}
+  className="w-full flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-300 rounded hover:bg-blue-500 hover:text-white"
+>
+  <span>Create Inwards</span>
+  <FiChevronDown
+    className={`${nestedDropdown === "inward" ? "rotate-180" : ""} transition`}
+  />
+</button>
+{nestedDropdown === "inward" &&
+  renderDropdown([
+    { to: "/stock/master/create-inward", label: "Inward Entry" },
+  ])}
+
         </nav>
 
         {/* Footer */}

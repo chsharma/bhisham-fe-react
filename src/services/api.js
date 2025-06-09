@@ -597,4 +597,91 @@ export const deleteSupplier = async (id) => {
 };
 
 
+export const getAllitem = async () => {
+  try {
+    const response = await api.get('stock/get-items');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const createItems = async (data) => {
+  try {
+    const response = await api.post('/stock/items', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updatedItems = async (id, data) => {
+  try {
+    const response = await api.put(`stock/update-items/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteItem = async (id) => {
+  try {
+    const response = await api.delete(`/stock/delete-items/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
+
+export const getAllbatch = async () => {
+  try {
+    const response = await api.get('stock/get-batches');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const createBatch = async (data) => {
+  try {
+    const response = await api.post('/stock/create-batches', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateBatch = async (id, data) => {
+  try {
+    const response = await api.put(`/stock/update-batches/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateBatchitem = async (id, data) => {
+  try {
+    const response = await api.put(`/stock/get-batches-by-itemid/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteBatches = async (id) => {
+  try {
+    const response = await api.delete(`/stock/delete-items/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export default api;
